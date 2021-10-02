@@ -116,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     if (mp.isPlaying()) {
                         mp.stop();
-                        mp.release();
+                        mp.reset();
                     } else {
                         toastNothingPlaying("There is nothing playing, try selecting a file!");
                     }
