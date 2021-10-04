@@ -36,8 +36,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
+// Okay so this is what allows our activity to return something. You'll see in this case it returns
+        // the intent.
         ActivityResultLauncher<Intent> mGetContent = registerForActivityResult(
+                // Starts the activity and looks for a result. You'll notice that
+                // in our on click launcher for the button, we call mGetContent.launch().
                 new ActivityResultContracts.StartActivityForResult(),
                 new ActivityResultCallback<ActivityResult>() {
                     @Override
@@ -55,7 +58,11 @@ public class MainActivity extends AppCompatActivity {
                             TextView testTitle = findViewById(R.id.textView2);
                             testTitle.setText("Currently Playing:" + currentlyPlayingSong);
                             try {
-
+                                // This sets the listener and tells the
+                                // the program that "Hey, we need to wait until the song
+                                // is loaded into memory before we can start it."
+                                // Otherwise we're going to get an error because it
+                                // tries to play a song that isn't loaded into memory.
                                 mp.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                                     @Override
                                     public void onPrepared(MediaPlayer mp) {
@@ -68,7 +75,8 @@ public class MainActivity extends AppCompatActivity {
                                 mp.setDataSource(realPath);
                                 // Prepares audio (Asynced for performance)
                                 mp.prepareAsync();
-                                // Errors
+                                // Errors (Note: These are auto generated blocks for catching errors.
+                                // It might be worth personalizing them.
                             } catch (IllegalArgumentException e) {
                                 // TODO Auto-generated catch block
                                 e.printStackTrace();
@@ -88,11 +96,11 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
 
-        // Just Grabbing our button for java code
+        // Just Grabbing our buttons for java code
         Button selectButton = findViewById(R.id.button);
         ImageButton stopButton = findViewById(R.id.StopButton);
         ImageButton playButton = findViewById(R.id.playButton);
-
+        // This is what happens when our play button is pressed.
         playButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -165,7 +173,7 @@ public class MainActivity extends AppCompatActivity {
         return result;
     }
 
-    public void toastNothingPlaying(String msg) {
+    protected void toastNothingPlaying(String msg) {
         Toast toast = Toast.makeText(this, msg, Toast.LENGTH_LONG);
         toast.show();
     }
