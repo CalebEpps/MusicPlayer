@@ -27,7 +27,6 @@ import java.io.IOException;
 public class MainActivity extends AppCompatActivity {
 
 
-
     // Declare our Media Player Early so it can be used everywhere in this class.
     MediaPlayer mp = new MediaPlayer();
     boolean isMPPlaying = false;
@@ -51,15 +50,11 @@ public class MainActivity extends AppCompatActivity {
                     // Think of it like a return statement.
                     public void onActivityResult(ActivityResult result) {
                         if (result.getResultCode() == Activity.RESULT_OK) {
-                            // So this gets the returned item from our selection and converts
-                            // its path to a readable form. VERY VERY hacky but it works.
+                            // So this gets the returned item from our selection
                             Intent data = result.getData();
                             Uri uri = data.getData();
-                           // String realPath = getRealPathFromURI(uri);
-                           // Log.e("PATH", realPath);
                             String currentlyPlayingSong = getFileName(uri);
                             TextView testTitle = findViewById(R.id.textView2);
-
 
 
                             Cursor returnCursor =
@@ -69,12 +64,12 @@ public class MainActivity extends AppCompatActivity {
                              * move to the first row in the Cursor, get the data,
                              * and display it.
                              */
+                            // Really Quick note, think of a cursor like traversing a database, we'll talk about it later.
                             int nameIndex = returnCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
                             int sizeIndex = returnCursor.getColumnIndex(OpenableColumns.SIZE);
                             returnCursor.moveToFirst();
-
+                            // This PROPERLY sets our currently playing song WITHOUT the need for an out of bounds issue with the cursor.
                             testTitle.setText("Currently Playing:" + returnCursor.getString((nameIndex)));
-
 
 
                             try {
@@ -125,12 +120,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 try {
-                        if (mp.isPlaying()) {
-                            isMPPlaying = false;
-                            mp.pause();
-                        } else {
-                            mp.start();
-                        }
+                    if (mp.isPlaying()) {
+                        isMPPlaying = false;
+                        mp.pause();
+                    } else {
+                        mp.start();
+                    }
 
                 } catch (Exception e) {
                     toastNothingPlaying("There is nothing playing, try selecting a file!");
@@ -138,7 +133,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-       stopButton.setOnClickListener(new View.OnClickListener() {
+        stopButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 try {
@@ -170,18 +165,14 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-
-
-
-
-
     }
 
 
     //  LMAO LOOK HOW EASY IT WAS IT'S TINY COMPARED TO THE CURSOR SHIT
     public String getFileName(Uri uri) {
+        // This creates a file object to be used with Java. It just works my guy
         File f = new File("" + uri);
-
+// This returns the file's name with the get name method lmao it's that simple
         return f.getName();
     }
 
