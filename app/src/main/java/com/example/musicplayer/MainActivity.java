@@ -13,6 +13,7 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.provider.OpenableColumns;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -20,6 +21,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.File;
 import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
@@ -30,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
     MediaPlayer mp = new MediaPlayer();
     boolean isMPPlaying = false;
     String currentlyPlayingSong;
+
     // onCreate Method for doing... Everything?
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,11 +55,28 @@ public class MainActivity extends AppCompatActivity {
                             // its path to a readable form. VERY VERY hacky but it works.
                             Intent data = result.getData();
                             Uri uri = data.getData();
-                            String realPath = getRealPathFromURI(uri);
-                            Log.e("PATH", realPath);
-                            String currentlyPlayingSong = realPath.substring(realPath.lastIndexOf("/")+1);
+                           // String realPath = getRealPathFromURI(uri);
+                           // Log.e("PATH", realPath);
+                            String currentlyPlayingSong = getFileName(uri);
                             TextView testTitle = findViewById(R.id.textView2);
-                            testTitle.setText("Currently Playing:" + currentlyPlayingSong);
+
+
+
+                            Cursor returnCursor =
+                                    getContentResolver().query(uri, null, null, null, null);
+                            /*
+                             * Get the column indexes of the data in the Cursor,
+                             * move to the first row in the Cursor, get the data,
+                             * and display it.
+                             */
+                            int nameIndex = returnCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+                            int sizeIndex = returnCursor.getColumnIndex(OpenableColumns.SIZE);
+                            returnCursor.moveToFirst();
+
+                            testTitle.setText("Currently Playing:" + returnCursor.getString((nameIndex)));
+
+
+
                             try {
                                 // This sets the listener and tells the
                                 // the program that "Hey, we need to wait until the song
@@ -72,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
                                     }
                                 });
                                 // This just sets our data source
-                                mp.setDataSource(realPath);
+                                mp.setDataSource(getApplicationContext(), uri);
                                 // Prepares audio (Asynced for performance)
                                 mp.prepareAsync();
                                 // Errors (Note: These are auto generated blocks for catching errors.
@@ -158,19 +178,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    //  it works and that's enough for me. Will be more detailed later. I'm tired.
-    private String getRealPathFromURI(Uri contentURI) {
-        String result;
-        Cursor cursor = getContentResolver().query(contentURI, null, null, null, null);
-        if (cursor == null) { // Source is Dropbox or other similar local file path
-            result = contentURI.getPath();
-        } else {
-            cursor.moveToFirst();
-            int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
-            result = cursor.getString(idx);
-            cursor.close();
-        }
-        return result;
+    //  LMAO LOOK HOW EASY IT WAS IT'S TINY COMPARED TO THE CURSOR SHIT
+    public String getFileName(Uri uri) {
+        File f = new File("" + uri);
+
+        return f.getName();
     }
 
     protected void toastNothingPlaying(String msg) {
