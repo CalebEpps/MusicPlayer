@@ -46,8 +46,9 @@ public class MainActivity extends AppCompatActivity {
     boolean isMPPlaying = false;
     String currentlyPlayingSong;
     ArrayList<String> songs;
-
+// Just a code to make sure no errors are returned.
     private final int REQUEST_CODE_PERMISSIONS = 101;
+    // We are storing these to use later.
     private final String[] REQUIRED_PERMISSIONS = new String[]{
             "android.permission.WRITE_EXTERNAL_STORAGE",
             "android.permission.READ_EXTERNAL_STORAGE",
@@ -100,6 +101,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Sets our button listener
        selectButton.setOnClickListener((v)->{
+           // Unicorn Picker is a third party library. Will explain later.
             UnicornFilePicker.from(MainActivity.this)
                     .addConfigBuilder()
                     .selectMultipleFiles(true)
