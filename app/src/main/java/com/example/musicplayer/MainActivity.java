@@ -43,26 +43,37 @@ public class MainActivity extends AppCompatActivity {
 
     // Declare our Media Player Early so it can be used everywhere in this class.
     MediaPlayer mp = new MediaPlayer();
+    // Boolean for mediaplayer, currently not used due to no ability to play music (Removed for testing)
     boolean isMPPlaying = false;
-    String currentlyPlayingSong;
+    // This is the arraylist of files the user is trying to import. It does NOT STORE SONGS THE USER HAS ALREADY SELECTED.
     ArrayList<String> songs;
-// Just a code to make sure no errors are returned.
+
+    // Just a code to make sure no errors are returned.
     private final int REQUEST_CODE_PERMISSIONS = 101;
+
     // We are storing these to use later.
     private final String[] REQUIRED_PERMISSIONS = new String[]{
             "android.permission.WRITE_EXTERNAL_STORAGE",
             "android.permission.READ_EXTERNAL_STORAGE",
     };
 
+
+
     // onCreate Method for doing... Everything?
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
+
         // Just Grabbing our buttons for java code
         Button selectButton = findViewById(R.id.button);
         ImageButton stopButton = findViewById(R.id.StopButton);
         ImageButton playButton = findViewById(R.id.playButton);
+
+
+
         // This is what happens when our play button is pressed.
         playButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -81,6 +92,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
+        // Currently unused method for stop button. Ability to Play Sound Removed.
         stopButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -99,9 +112,17 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
+
+
         // Sets our button listener
        selectButton.setOnClickListener((v)->{
-           // Unicorn Picker is a third party library. Will explain later.
+           // Unicorn Picker is a third party library that allows a unified method of
+           // selecting files and folders. The reason we decided to go with this method
+           // is to preserve compatibility across our app with little issue.
+           // In Android, due to their sweeping API changes, much code
+           // that was written for API 30 won't work with 21-28.
+           // Our solution to this is to use a third party library that is updated
+           // to work with files across most API versions >21.
             UnicornFilePicker.from(MainActivity.this)
                     .addConfigBuilder()
                     .selectMultipleFiles(true)
@@ -127,28 +148,44 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    // Here is our onActivityResult method. This is now separated out of the onCreate method because
+    // it was causing issues. Basically This is overidden for the CLASS, not the method itself.
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode == Constants.REQ_UNICORN_FILE && resultCode == RESULT_OK){
             if(data!=null){
+                ArrayList<String> titles = new ArrayList<String>();
+                ArrayList<String> paths = new ArrayList<String>();
                 songs = data.getStringArrayListExtra("filePaths");
+                int counter = 0;
+                // this loop iterates over EVERY SELECTED FILE. It will be used to
+                // store our song's information in its respective JSON file.
                 for(String file : songs){
                     Log.e(TAG, file);
+                    File realFile = new File(songs.get(counter));
+                    paths.add(file);
+                    String songName = realFile.getName().replace(".mp3", "");
+                    titles.add(songName);
+                    Log.e("FILE NAME: ", songName);
+                    counter++;
 
+
+                }
+                ParseSongList parser = new ParseSongList();
+                try {
+                    parser.populateListFirstTime(paths,titles);
+                    Log.e("SUCCESS", "SUCCESS");
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             } else {
                 Log.e("path","empty");
             }
-            try {
-                mp.setDataSource(songs.get(1));
-                mp.prepareAsync();
-            } catch(Exception e) {
-                Log.e("Path", "ERROR PLAYING SONG");
-                Log.e("ERROR",e.getMessage());
-            }
         }
     }
+
+    // So this is just checking for the correct permission. It spits out an error log with a toast message.
     private boolean allPermissionsGranted() {
         for (String permission : REQUIRED_PERMISSIONS) {
             if (ContextCompat.checkSelfPermission(MainActivity.this, permission) != PackageManager.PERMISSION_GRANTED) {
@@ -158,6 +195,8 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+
+    // This gets the results of the allPermissionsGranted() method to check them.
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
