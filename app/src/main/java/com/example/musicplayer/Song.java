@@ -4,8 +4,10 @@ public class Song {
     private String title;
     private String genre;
     private String artist;
+    private String path;
 
-    public Song(String title, String genre, String artist) {
+    public Song(String title, String genre, String artist, String path) {
+        this.path = path;
         this.title = title;
         this.genre = genre;
         this.artist = artist;
