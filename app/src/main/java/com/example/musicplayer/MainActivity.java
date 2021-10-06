@@ -89,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
                         mp.stop();
                         mp.reset();
                     } else {
-                 //       toastNothingPlaying("There is nothing playing, try selecting a file!");
+                 //      toastNothingPlaying("There is nothing playing, try selecting a file!");
                     }
 
                 } catch (Exception e) {
@@ -109,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
                     .setRootDirectory(Environment.getExternalStorageDirectory().getAbsolutePath())
                     .showHiddenFiles(false)
                     .addItemDivider(true)
-                    .theme(R.style.UnicornFilePicker_Dracula)
+                    .theme(R.style.UnicornFilePicker_Default)
                     .build()
                     .forResult(Constants.REQ_UNICORN_FILE);
         });
