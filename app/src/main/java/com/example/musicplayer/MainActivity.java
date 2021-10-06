@@ -135,6 +135,7 @@ public class MainActivity extends AppCompatActivity {
                 songs = data.getStringArrayListExtra("filePaths");
                 for(String file : songs){
                     Log.e(TAG, file);
+
                 }
             } else {
                 Log.e("path","empty");
