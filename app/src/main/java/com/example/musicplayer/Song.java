@@ -1,15 +1,26 @@
 package com.example.musicplayer;
 
+import java.util.ArrayList;
+
 public class Song {
     private String title;
     private String genre;
-
+    private String artist;
     private String path;
+
+    public String getArtist() {
+        return artist;
+    }
+
+    public void setArtist(String artist) {
+        this.artist = artist;
+    }
 
     public Song(String title, String genre, String artist) {
         this.path = path;
         this.title = title;
         this.genre = genre;
+        this.artist = artist;
 
     }
 

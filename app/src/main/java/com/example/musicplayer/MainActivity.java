@@ -9,7 +9,10 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -65,12 +68,27 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Song[] songs = {
+                new Song("Test Song 1","K Rock", "Bit Kitty"),
+                new Song("Test Song 2","K Metal", "Itty Bitty Titty Committee")
+
+
+
+        };
+
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.songList);
+       SongAdapter adapter = new SongAdapter(songs);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setAdapter(adapter);
+
 
 
         // Just Grabbing our buttons for java code
         Button selectButton = findViewById(R.id.button);
         ImageButton stopButton = findViewById(R.id.StopButton);
         ImageButton playButton = findViewById(R.id.playButton);
+        RecyclerView rv = (RecyclerView) findViewById(R.id.songList);
 
 
 
@@ -169,16 +187,29 @@ public class MainActivity extends AppCompatActivity {
                     titles.add(songName);
                     Log.e("FILE NAME: ", songName);
                     counter++;
-
-
                 }
+                // END OF FOR LOOP
+
+
+                String folder_main = "WGACA";
+                File directoryToCreate = new File(Environment.getExternalStorageDirectory(), folder_main);
                 ParseSongList parser = new ParseSongList();
-                try {
-                    parser.populateListFirstTime(paths,titles);
-                    Log.e("SUCCESS", "SUCCESS");
-                } catch (IOException e) {
-                    e.printStackTrace();
+                if(directoryToCreate.exists()) {
+                    parser.populateExistingList(paths, titles);
+                    Log.e("ITEMS: ", String.valueOf(parser.getLength()));
+                   // Log.e("POPULATELISTERROR: ", "FOLDER ALREADY EXISTS.");
+                } else {
+
+                    try {
+                        parser.populateListFirstTime(paths,titles);
+                        Log.e("ITEMS: ", String.valueOf(parser.getLength()));
+                        Log.e("POPULATELISTSUCCESS", "FILES ADDED TO JSON FILE SUCCESSFULLY (FIRST TIME RUN)");
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
+
+
             } else {
                 Log.e("path","empty");
             }

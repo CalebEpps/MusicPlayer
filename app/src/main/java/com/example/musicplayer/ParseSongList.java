@@ -8,13 +8,20 @@ import android.util.Log;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -24,6 +31,8 @@ import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.Set;
 
 public class ParseSongList extends AppCompatActivity {
 
@@ -40,11 +49,11 @@ public class ParseSongList extends AppCompatActivity {
         JSONObject jsonObj;
 
         try {
-            Log.e("JSON FILE REACHED", "TRUE");
+            Log.e("NEW JSON FILE?", "TRUE");
             jsonObj = new JSONObject();
             JSONArray jsonArray = new JSONArray();
             for (int i = 0; i < paths.size(); i++) {
-                Log.e("JSON LOOP", "TRUE");
+                Log.e("NEW JSON LOOP?", "TRUE");
                 JSONObject newEntry = new JSONObject();
                 newEntry.put("songTitle", (String) names.get(i));
                 newEntry.put("songPath", (String) paths.get(i));
@@ -76,12 +85,77 @@ public class ParseSongList extends AppCompatActivity {
 
     }
 
+    public void populateExistingList(ArrayList paths, ArrayList names) {
 
-        public Song getSong(String path) {
+        JSONObject jsonObj;
+
+        try {
+            Log.e("EXISTING JSON?", "TRUE");
+            jsonObj = new JSONObject();
+            JSONArray jsonArray = new JSONArray();
+            for (int i = 0; i < paths.size(); i++) {
+                Log.e("EXISTING LOOP?", "TRUE");
+                JSONObject newEntry = new JSONObject();
+                try {
+                    newEntry.put("songTitle", (String) names.get(i));
+                    newEntry.put("songPath", (String) paths.get(i));
+                    jsonArray.put(newEntry);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
 
 
-        return null;
+            String folder_main = "WGACA";
+
+            File directoryToCreate = new File(Environment.getExternalStorageDirectory(), folder_main);
+            directoryToCreate.mkdirs();
+
+            File initJSONFile = new File(Environment.getExternalStorageDirectory(),"WGACA");
+            FileOutputStream outputStream = new FileOutputStream(initJSONFile + "/songs.txt",true);
+            for(int i = 0; i < jsonArray.length(); i++) {
+                byte[] strToBytes = jsonArray.get(i).toString().getBytes("utf-8");
+                outputStream.write(strToBytes);
+            }
+            byte[] strToBytes = jsonObj.toString().getBytes("utf-8");
+            outputStream.write(strToBytes);
+
+            outputStream.close();
+        } catch (JSONException | IOException e) {
+            Log.e("ERROR", "FALSE");
+            e.printStackTrace();
         }
+    }
+
+
+        public int getLength() {
+            JSONArray jsonArray = null;
+            int counter = 0;
+
+                File initJSONFile = new File(Environment.getExternalStorageDirectory(),"WGACA");
+            try {
+                FileInputStream inputStream = new FileInputStream(initJSONFile + "/songs.txt");
+                Log.e("COUNTER PATH: ", inputStream.toString());
+                BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
+                StringBuilder sb = new StringBuilder();
+                for (String line; (line = br.readLine()) != null; ) {
+                    sb.append(line);
+                }
+
+                String toParse = sb.toString();
+                Log.e("SB: ", toParse);
+
+
+            } catch (FileNotFoundException fileNotFoundException) {
+                fileNotFoundException.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return counter;
+
+    }
+
 
         public void deleteSong(String path) {
 

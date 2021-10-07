@@ -3,4 +3,6 @@
     <string name="second_main_name">Where Every Song is a Circle</string>
     <string name="select_file_button">Select Folder to Scan</string>
     <string name="parody_banner">Haha Funy</string>
+    <string name="songTitle"> Default Song (I broke RIP :()</string>
+    <string name="Genre">Default Genre (Yeah I broke sorry)</string>
 </resources>
