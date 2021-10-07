@@ -22,11 +22,13 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.provider.OpenableColumns;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -190,13 +192,17 @@ public class MainActivity extends AppCompatActivity {
                 }
                 // END OF FOR LOOP
 
-
-                String folder_main = "WGACA";
+                // This is the name of the folder we've either created or need to create.
+                String folder_main = "/Documents/songs.json";
+                // This is just setting the directory of the folder so we can see if it exists or not.
                 File directoryToCreate = new File(Environment.getExternalStorageDirectory(), folder_main);
+                // The creates our parser so we can use it in the below if/else statements.
                 ParseSongList parser = new ParseSongList();
+                // Does the directory exist? If so, we will populate the existing file.
                 if(directoryToCreate.exists()) {
-                    parser.populateExistingList(paths, titles);
-                    Log.e("ITEMS: ", String.valueOf(parser.getLength()));
+                    // Try Catch to catch errors in our inputstream in the method below.
+                        Log.e("DIRECTORY EXISTS?: ", "True");
+                        parser.populateExistingList(paths, titles);
                    // Log.e("POPULATELISTERROR: ", "FOLDER ALREADY EXISTS.");
                 } else {
 

@@ -37,8 +37,13 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
     implementation "com.github.abhishekti7:UnicornFilePicker:1.0.2"
     implementation 'com.google.code.gson:gson:2.8.8'
-    implementation 'com.googlecode.json-simple:json-simple:1.1'
+// https://mvnrepository.com/artifact/org.json/json
     // https://mvnrepository.com/artifact/com.googlecode.json-simple/json-simple
-   // implementation group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'
-
+    implementation 'com.googlecode.json-simple:json-simple:1.1.1'
 }
+configurations.all {
+    resolutionStrategy.dependencySubstitution {
+        substitute module('org.hamcrest:hamcrest-core:1.1') with module('junit:junit:4.10')
+    }
+}
+configurations { compile.exclude group: "junit", module: "junit" }
