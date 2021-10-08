@@ -36,6 +36,8 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.simple.parser.ParseException;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -52,7 +54,6 @@ public class MainActivity extends AppCompatActivity {
     boolean isMPPlaying = false;
     // This is the arraylist of files the user is trying to import. It does NOT STORE SONGS THE USER HAS ALREADY SELECTED.
     ArrayList<String> songs;
-
     // Just a code to make sure no errors are returned.
     private final int REQUEST_CODE_PERMISSIONS = 101;
 
@@ -62,7 +63,10 @@ public class MainActivity extends AppCompatActivity {
             "android.permission.READ_EXTERNAL_STORAGE",
     };
 
-
+    // The creates our parser so we can use it in the below if/else statements.
+    ParseSongList parser = new ParseSongList();
+    // This is our array of songs for the recyclerView
+    Song[] songArr;
 
     // onCreate Method for doing... Everything?
     @Override
@@ -70,19 +74,20 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Song[] songs = {
-                new Song("Test Song 1","K Rock", "Bit Kitty"),
-                new Song("Test Song 2","K Metal", "Itty Bitty Titty Committee")
+        // Quickly Populates our recycler view song list.
+        songArr = parser.getEntries();
+        if(songArr != null) {
+            RecyclerView recyclerView = (RecyclerView) findViewById(R.id.songList);
+            SongAdapter adapter = new SongAdapter(songArr);
+            recyclerView.setHasFixedSize(false);
+            recyclerView.setLayoutManager(new LinearLayoutManager(this));
+            recyclerView.setAdapter(adapter);
+        } else {
 
+        }
 
-
-        };
-
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.songList);
-       SongAdapter adapter = new SongAdapter(songs);
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setAdapter(adapter);
+        // This block of code sets our recycler view accordingly with
+        // the parameters we want.
 
 
 
@@ -90,8 +95,6 @@ public class MainActivity extends AppCompatActivity {
         Button selectButton = findViewById(R.id.button);
         ImageButton stopButton = findViewById(R.id.StopButton);
         ImageButton playButton = findViewById(R.id.playButton);
-        RecyclerView rv = (RecyclerView) findViewById(R.id.songList);
-
 
 
         // This is what happens when our play button is pressed.
@@ -107,7 +110,7 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                 } catch (Exception e) {
-             //       toastNothingPlaying("There is nothing playing, try selecting a file!");
+                    //       toastNothingPlaying("There is nothing playing, try selecting a file!");
                 }
             }
         });
@@ -122,27 +125,25 @@ public class MainActivity extends AppCompatActivity {
                         mp.stop();
                         mp.reset();
                     } else {
-                 //      toastNothingPlaying("There is nothing playing, try selecting a file!");
+                        //      toastNothingPlaying("There is nothing playing, try selecting a file!");
                     }
 
                 } catch (Exception e) {
-              //      toastNothingPlaying("There is nothing playing, try selecting a file!");
+                    //      toastNothingPlaying("There is nothing playing, try selecting a file!");
                 }
             }
         });
 
 
-
-
         // Sets our button listener
-       selectButton.setOnClickListener((v)->{
-           // Unicorn Picker is a third party library that allows a unified method of
-           // selecting files and folders. The reason we decided to go with this method
-           // is to preserve compatibility across our app with little issue.
-           // In Android, due to their sweeping API changes, much code
-           // that was written for API 30 won't work with 21-28.
-           // Our solution to this is to use a third party library that is updated
-           // to work with files across most API versions >21.
+        selectButton.setOnClickListener((v) -> {
+            // Unicorn Picker is a third party library that allows a unified method of
+            // selecting files and folders. The reason we decided to go with this method
+            // is to preserve compatibility across our app with little issue.
+            // In Android, due to their sweeping API changes, much code
+            // that was written for API 30 won't work with 21-28.
+            // Our solution to this is to use a third party library that is updated
+            // to work with files across most API versions >21.
             UnicornFilePicker.from(MainActivity.this)
                     .addConfigBuilder()
                     .selectMultipleFiles(true)
@@ -173,21 +174,28 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == Constants.REQ_UNICORN_FILE && resultCode == RESULT_OK){
-            if(data!=null){
+        if (requestCode == Constants.REQ_UNICORN_FILE && resultCode == RESULT_OK) {
+            if (data != null) {
+                // Two important arraylists for populating our JSON file.
                 ArrayList<String> titles = new ArrayList<String>();
                 ArrayList<String> paths = new ArrayList<String>();
+                // This just gets all of the files that were returned from the previous activity.
                 songs = data.getStringArrayListExtra("filePaths");
+                // Counter. Unused Variable
                 int counter = 0;
                 // this loop iterates over EVERY SELECTED FILE. It will be used to
                 // store our song's information in its respective JSON file.
-                for(String file : songs){
+                for (String file : songs) {
                     Log.e(TAG, file);
                     File realFile = new File(songs.get(counter));
+                    // this adds the path to our paths list. ALSO VERY IMPORTANT.
                     paths.add(file);
+                    // Does the song end in MP3? Gross, let's remove it.
                     String songName = realFile.getName().replace(".mp3", "");
+                    // Adds the song's name to our titles list. VERY important.
                     titles.add(songName);
                     Log.e("FILE NAME: ", songName);
+                    // Unused Incremented Variable
                     counter++;
                 }
                 // END OF FOR LOOP
@@ -196,20 +204,32 @@ public class MainActivity extends AppCompatActivity {
                 String folder_main = "/Documents/songs.json";
                 // This is just setting the directory of the folder so we can see if it exists or not.
                 File directoryToCreate = new File(Environment.getExternalStorageDirectory(), folder_main);
-                // The creates our parser so we can use it in the below if/else statements.
-                ParseSongList parser = new ParseSongList();
                 // Does the directory exist? If so, we will populate the existing file.
-                if(directoryToCreate.exists()) {
-                    // Try Catch to catch errors in our inputstream in the method below.
-                        Log.e("DIRECTORY EXISTS?: ", "True");
-                        parser.populateExistingList(paths, titles);
-                   // Log.e("POPULATELISTERROR: ", "FOLDER ALREADY EXISTS.");
-                } else {
+                if (directoryToCreate.exists()) {
+                    // Populates an existing Directory if it's necessary.
+                    Log.e("DIRECTORY EXISTS?: ", "True");
+                    parser.populateExistingList(paths, titles);
+                    // Log.e("POPULATELISTERROR: ", "FOLDER ALREADY EXISTS.");
 
+                } else {
+                    // This executes the FIRST TIME our user runs the app and selects files.
                     try {
-                        parser.populateListFirstTime(paths,titles);
+                        parser.populateListFirstTime(paths, titles);
                         Log.e("ITEMS: ", String.valueOf(parser.getLength()));
                         Log.e("POPULATELISTSUCCESS", "FILES ADDED TO JSON FILE SUCCESSFULLY (FIRST TIME RUN)");
+
+                        // This will populate and initialize our recycleview our FIRST ENTRIES once they've been added.
+                        songArr = parser.getEntries();
+                        if(songArr != null) {
+                            RecyclerView recyclerView = (RecyclerView) findViewById(R.id.songList);
+                            SongAdapter adapter = new SongAdapter(songArr);
+                            recyclerView.setHasFixedSize(false);
+                            recyclerView.setLayoutManager(new LinearLayoutManager(this));
+                            recyclerView.setAdapter(adapter);
+                        } else {
+                            // This prolly means something went wrong RIP :(
+                            // You should NOT hit this else block, it's here for reference
+                        }
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -217,9 +237,11 @@ public class MainActivity extends AppCompatActivity {
 
 
             } else {
-                Log.e("path","empty");
+                // Lets us know our path was RIP Empty.
+                Log.e("path", "empty");
             }
         }
+
     }
 
     // So this is just checking for the correct permission. It spits out an error log with a toast message.

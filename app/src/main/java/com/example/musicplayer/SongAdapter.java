@@ -39,7 +39,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
     public int getItemCount() {
         ParseSongList parser = new ParseSongList();
 
-        return 2;
+        return parser.getLength();
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
