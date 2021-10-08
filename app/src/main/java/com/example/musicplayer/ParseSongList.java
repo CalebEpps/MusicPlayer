@@ -58,8 +58,8 @@ public class ParseSongList extends AppCompatActivity {
         // IF API version is higher than 30, we need to NOT create our folder. If it is lower than 30,
         // we can create one.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            File directoryToCreate = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS) + filePathEnd);
-            directoryToCreate.mkdirs();
+            File directoryToCreate = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).getPath());
+            //directoryToCreate.mkdirs();
             // Initialize our JSON file and output stream. This will allow us to write to our file.
             File initJSONFile = new File(directoryToCreate.getPath());
             FileOutputStream outputStream = new FileOutputStream(initJSONFile + "/songs.json");
@@ -100,7 +100,7 @@ public class ParseSongList extends AppCompatActivity {
 
         // If API version is > 30, we need to write/read to docs folder, NOT our own.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            filePathEnd = "Documents/Documents";
+            filePathEnd = "Documents";
         } else {
             filePathEnd = "WGACA";
         }

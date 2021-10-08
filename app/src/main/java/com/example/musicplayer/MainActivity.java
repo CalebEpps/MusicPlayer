@@ -78,6 +78,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
+
         // Quickly Populates our recycler view song list.
         songArr = parser.getEntries();
         if(songArr != null) {
@@ -213,17 +215,19 @@ public class MainActivity extends AppCompatActivity {
 
                 // This is the name of the folder we've either created or need to create.
                 String sdkunder29 = "/WGACA/songs.json";
-                String sdkOver30 = "/Documents/songs.json";
+                String sdkOver30 = "/songs.json";
                 File directoryToCreate;
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                      directoryToCreate = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS) + sdkOver30);
-                     Log.e("DIRECTORY: ",directoryToCreate.getPath());
+
                 } else {
                      directoryToCreate = new File(Environment.getExternalStorageDirectory(), sdkunder29);
                 }
 
                 // Does the directory exist? If so, we will populate the existing file.
+
+                Log.e("DIRECTORY: ",directoryToCreate.getPath());
                 if (directoryToCreate.exists()) {
                     // Populates an existing Directory if it's necessary.
                     Log.e("DIRECTORY EXISTS?: ", "True");
@@ -252,7 +256,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                     } catch (IOException e) {
                         Log.e("ERROR IN IO", "IO ERROR IN POPULATE FIRST TIME");
-                        Log.e(TAG,e.getLocalizedMessage());
+                        Log.e(TAG, e.getMessage());
                     }
                 }
 
