@@ -49,27 +49,46 @@ public class ParseSongList extends AppCompatActivity {
 
         }
         // If API version is > 30, we need to write to docs folder, NOT our own.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            filePathEnd = "Documents";
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            filePathEnd = "/Documents";
         } else {
-            filePathEnd = "WGACA";
+            filePathEnd = "/WGACA";
+
         }
         // IF API version is higher than 30, we need to NOT create our folder. If it is lower than 30,
         // we can create one.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            File directoryToCreate = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS) + filePathEnd);
+            directoryToCreate.mkdirs();
+            // Initialize our JSON file and output stream. This will allow us to write to our file.
+            File initJSONFile = new File(directoryToCreate.getPath());
+            FileOutputStream outputStream = new FileOutputStream(initJSONFile + "/songs.json");
+            byte[] strToBytes = jsonArray.toString().getBytes("utf-8");
+            // Here we just write the bytes of our jsonarray to our output file.
+            outputStream.write(strToBytes);
+            // Close the output file. :)
+            outputStream.close();
         } else {
             File directoryToCreate = new File(Environment.getExternalStorageDirectory(), filePathEnd);
             directoryToCreate.mkdirs();
+            // Initialize our JSON file and output stream. This will allow us to write to our file.
+            File initJSONFile = new File(Environment.getExternalStorageDirectory(), filePathEnd);
+            FileOutputStream outputStream = new FileOutputStream(initJSONFile + "/songs.json");
+            byte[] strToBytes = jsonArray.toString().getBytes("utf-8");
+            // Here we just write the bytes of our jsonarray to our output file.
+            outputStream.write(strToBytes);
+            // Close the output file. :)
+            outputStream.close();
+
         }
-        // Initialize our JSON file and output stream. This will allow us to write to our file.
+/*        // Initialize our JSON file and output stream. This will allow us to write to our file.
         File initJSONFile = new File(Environment.getExternalStorageDirectory(), filePathEnd);
         FileOutputStream outputStream = new FileOutputStream(initJSONFile + "/songs.json");
         byte[] strToBytes = jsonArray.toString().getBytes("utf-8");
         // Here we just write the bytes of our jsonarray to our output file.
         outputStream.write(strToBytes);
         // Close the output file. :)
-        outputStream.close();
+        outputStream.close();*/
 
 
     }
@@ -81,7 +100,7 @@ public class ParseSongList extends AppCompatActivity {
 
         // If API version is > 30, we need to write/read to docs folder, NOT our own.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            filePathEnd = "Documents";
+            filePathEnd = "Documents/Documents";
         } else {
             filePathEnd = "WGACA";
         }
@@ -90,8 +109,11 @@ public class ParseSongList extends AppCompatActivity {
 
         try {
             Reader reader = new FileReader(new File(Environment.getExternalStorageDirectory(), filePathEnd + "/songs.json"));
+            Log.e("PATH EXSTING: ", new File(Environment.getExternalStorageDirectory(), filePathEnd + "/songs.json").getPath());
             JSONArray jsonArray = (JSONArray) parser.parse(reader);
             //Log.e("OBJECT TEST:", String.valueOf(jsonArray));
+
+            // This for loop iterates over our existing entries andis for testing purposes.
             for (int i = 0; i < jsonArray.size(); i++) {
                 String name = jsonArray.get(i).toString();
                 JSONObject jsonObj = (JSONObject) jsonArray.get(i);
@@ -100,6 +122,8 @@ public class ParseSongList extends AppCompatActivity {
                 //    Log.e("OBJECT TEST:", name);
             }
 
+
+            // This for loop iterates over our NEW entries and adds them to our jsonarray
             for (int i = 0; i < paths.size(); i++) {
                 // Log.e("NEW JSON LOOP?", "TRUE");
                 // Temp JSON Object to hold our data
@@ -110,6 +134,18 @@ public class ParseSongList extends AppCompatActivity {
                 jsonArray.add(newEntry);
 
             }
+
+/*            for(int i = 0; i < jsonArray.size(); i++) {
+                JSONObject jsonObj = (JSONObject) jsonArray.get(i);
+                String jsonStr = (String) jsonObj.get("songPath");
+                for(int j = 0; j < jsonArray.size(); j++ ) {
+                    JSONObject jsonObj2 = (JSONObject) jsonArray.get(j);
+                    String jsonStr2 = (String) jsonObj2.get("songPath");
+                    if(jsonStr.equals(jsonStr2)) {
+                        jsonArray.remove(jsonObj2);
+                    }
+                }
+            }*/
 
             File initJSONFile = new File(Environment.getExternalStorageDirectory(), filePathEnd);
             FileOutputStream outputStream = new FileOutputStream(initJSONFile + "/songs.json");
@@ -203,6 +239,7 @@ public class ParseSongList extends AppCompatActivity {
             return songs;
 
     }
+
 }
 
 

@@ -68,6 +68,10 @@ public class MainActivity extends AppCompatActivity {
     // This is our array of songs for the recyclerView
     Song[] songArr;
 
+
+
+
+
     // onCreate Method for doing... Everything?
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,6 +89,8 @@ public class MainActivity extends AppCompatActivity {
         } else {
 
         }
+
+
 
         // This block of code sets our recycler view accordingly with
         // the parameters we want.
@@ -200,15 +206,29 @@ public class MainActivity extends AppCompatActivity {
                 }
                 // END OF FOR LOOP
 
-                // This is the name of the folder we've either created or need to create.
-                String folder_main = "/Documents/songs.json";
+
                 // This is just setting the directory of the folder so we can see if it exists or not.
-                File directoryToCreate = new File(Environment.getExternalStorageDirectory(), folder_main);
+
+
+
+                // This is the name of the folder we've either created or need to create.
+                String sdkunder29 = "/WGACA/songs.json";
+                String sdkOver30 = "/Documents/songs.json";
+                File directoryToCreate;
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                     directoryToCreate = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS) + sdkOver30);
+                     Log.e("DIRECTORY: ",directoryToCreate.getPath());
+                } else {
+                     directoryToCreate = new File(Environment.getExternalStorageDirectory(), sdkunder29);
+                }
+
                 // Does the directory exist? If so, we will populate the existing file.
                 if (directoryToCreate.exists()) {
                     // Populates an existing Directory if it's necessary.
                     Log.e("DIRECTORY EXISTS?: ", "True");
                     parser.populateExistingList(paths, titles);
+
                     // Log.e("POPULATELISTERROR: ", "FOLDER ALREADY EXISTS.");
 
                 } else {
@@ -231,7 +251,8 @@ public class MainActivity extends AppCompatActivity {
                             // You should NOT hit this else block, it's here for reference
                         }
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        Log.e("ERROR IN IO", "IO ERROR IN POPULATE FIRST TIME");
+                        Log.e(TAG,e.getLocalizedMessage());
                     }
                 }
 
