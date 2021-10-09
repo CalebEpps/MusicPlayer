@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.media.MediaPlayer;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
@@ -266,12 +267,20 @@ public class MainActivity extends AppCompatActivity {
 
 
                 // This is just setting the directory of the folder so we can see if it exists or not.
-
+                // Support for Android 28+ has been removed. It can easily be added back by adding conditionals here.
 
 
                 // This is the name of the folder we've either created or need to create.
                 String sdkunder29 = "/WGACA/songs.json";
-                File directoryToCreate = new File(Environment.getExternalStorageDirectory(), sdkunder29);
+                String sdkOver29 = "/Documents/songs.json";
+                File directoryToCreate;
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                     directoryToCreate = new File(Environment.getExternalStorageDirectory(), sdkOver29);
+                } else {
+                     directoryToCreate = new File(Environment.getExternalStorageDirectory(), sdkunder29);
+                }
+
 
                 // Does the directory exist? If so, we will populate the existing file.
                 Log.e("DIRECTORY: ",directoryToCreate.getPath());
@@ -285,7 +294,7 @@ public class MainActivity extends AppCompatActivity {
                         CDLList.insertNode(new Song(titles.get(i), paths.get(i)));
                     //    Log.e("CDLL POPULATED:",CDLList.head.song.getTitle());
                     }
-
+                    // This code will parse our JSON file and reset the recycler view to include all of our added songs.
                     songArr = parser.getEntries();
                     RecyclerView recyclerView = (RecyclerView) findViewById(R.id.songList);
                     SongAdapter adapter = new SongAdapter(songArr);
