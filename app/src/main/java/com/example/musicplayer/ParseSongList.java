@@ -231,7 +231,7 @@ public class ParseSongList extends AppCompatActivity {
             //Log.e("OBJECT TEST:", String.valueOf(jsonArray));
             for (int i = 0; i < songs.length; i++) {
                 JSONObject jsonObj = (JSONObject) jsonArray.get(i);
-                songs[i] = new Song(jsonObj.get("songTitle").toString(),"default","default");
+                songs[i] = new Song(jsonObj.get("songTitle").toString(),jsonObj.get("songPath").toString());
                //    Log.e("PARSE METHOD:", songs[i].getTitle());
                 //    Log.e("OBJECT TEST:", name);
             }

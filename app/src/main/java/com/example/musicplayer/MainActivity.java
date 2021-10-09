@@ -67,6 +67,12 @@ public class MainActivity extends AppCompatActivity {
     ParseSongList parser = new ParseSongList();
     // This is our array of songs for the recyclerView
     Song[] songArr;
+    CyclicDouble CDLList = new CyclicDouble();
+    Node nextSong;
+    //   Log.e("TEST CDLL:", CDLList.toString());
+
+    int songCounter = 0;
+
 
 
 
@@ -87,15 +93,45 @@ public class MainActivity extends AppCompatActivity {
             SongAdapter adapter = new SongAdapter(songArr);
             recyclerView.setHasFixedSize(false);
             recyclerView.setLayoutManager(new LinearLayoutManager(this));
+            // Populates our CDLL With songs at startup.
+            for(int i = 0; i < songArr.length; i++) {
+                CDLList.insertNode(songArr[i]);
+            }
+
+            nextSong = CDLList.head;
+
+            Log.e("DID POPULATE?:",CDLList.toString());
+
             recyclerView.setAdapter(adapter);
         } else {
+            // Nothing will happen here leaving our CDLL null;
 
         }
 
 
 
-        // This block of code sets our recycler view accordingly with
-        // the parameters we want.
+
+
+        // What happens when the song is done.
+        mp.setOnCompletionListener(
+                new MediaPlayer.OnCompletionListener() {
+                    @Override
+                    public void onCompletion(MediaPlayer mediaPlayer) {
+                        mp.reset();
+                        nextSong = nextSong.next;
+                        String pathToPlay =  nextSong.song.getPath();
+                        try {
+                            mp.setDataSource(pathToPlay);
+                            mp.prepareAsync();
+
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                }
+
+        );
 
 
 
@@ -215,23 +251,26 @@ public class MainActivity extends AppCompatActivity {
 
                 // This is the name of the folder we've either created or need to create.
                 String sdkunder29 = "/WGACA/songs.json";
-                String sdkOver30 = "/songs.json";
-                File directoryToCreate;
-
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                     directoryToCreate = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS) + sdkOver30);
-
-                } else {
-                     directoryToCreate = new File(Environment.getExternalStorageDirectory(), sdkunder29);
-                }
+                File directoryToCreate = new File(Environment.getExternalStorageDirectory(), sdkunder29);
 
                 // Does the directory exist? If so, we will populate the existing file.
-
                 Log.e("DIRECTORY: ",directoryToCreate.getPath());
                 if (directoryToCreate.exists()) {
                     // Populates an existing Directory if it's necessary.
                     Log.e("DIRECTORY EXISTS?: ", "True");
                     parser.populateExistingList(paths, titles);
+
+                    // Ensure that we add our newly selected songs to our CDLL.
+                    for(int i = 0; i < paths.size(); i++) {
+                        CDLList.insertNode(new Song(titles.get(i), paths.get(i)));
+                    //    Log.e("CDLL POPULATED:",CDLList.head.song.getTitle());
+                    }
+
+                    songArr = parser.getEntries();
+                    RecyclerView recyclerView = (RecyclerView) findViewById(R.id.songList);
+                    SongAdapter adapter = new SongAdapter(songArr);
+                    recyclerView.setAdapter(adapter);
+
 
                     // Log.e("POPULATELISTERROR: ", "FOLDER ALREADY EXISTS.");
 
@@ -258,40 +297,31 @@ public class MainActivity extends AppCompatActivity {
                         Log.e("ERROR IN IO", "IO ERROR IN POPULATE FIRST TIME");
                         Log.e(TAG, e.getMessage());
                     }
-                }
 
+
+
+                // This is our for loop to add the new songs to our CDLL.
+                for(int i = 0; i < paths.size(); i++) {
+                    CDLList.insertNode(new Song(titles.get(i), paths.get(i)));
+                    Log.e("CDLL POPULATED:",CDLList.head.song.getTitle());
+                }
+                nextSong = CDLList.head;
+                String pathToPlay =  nextSong.song.getPath();
+                    try {
+                        mp.setDataSource(pathToPlay);
+                        mp.prepareAsync();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+            }
 
             } else {
-                // Lets us know our path was RIP Empty.
+                // Lets us know our path was RIP Empty. THIS SHOULD NOT REALLY HAPPEN UNLESS THE USER CLOSES THE APP
                 Log.e("path", "empty");
             }
         }
-
-    }
-
-    // So this is just checking for the correct permission. It spits out an error log with a toast message.
-    private boolean allPermissionsGranted() {
-        for (String permission : REQUIRED_PERMISSIONS) {
-            if (ContextCompat.checkSelfPermission(MainActivity.this, permission) != PackageManager.PERMISSION_GRANTED) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-
-    // This gets the results of the allPermissionsGranted() method to check them.
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == REQUEST_CODE_PERMISSIONS) {
-            if (allPermissionsGranted()) {
-                Toast.makeText(MainActivity.this, "Permissions granted by the user.", Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(MainActivity.this, "Permissions not granted by the user.", Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
 }
 
 

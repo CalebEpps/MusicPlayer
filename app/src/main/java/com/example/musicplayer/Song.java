@@ -16,11 +16,9 @@ public class Song {
         this.artist = artist;
     }
 
-    public Song(String title, String genre, String artist) {
+    public Song(String title, String path) {
         this.path = path;
         this.title = title;
-        this.genre = genre;
-        this.artist = artist;
 
     }
 
@@ -38,5 +36,13 @@ public class Song {
 
     public void setGenre(String genre) {
         this.genre = genre;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
     }
 }
