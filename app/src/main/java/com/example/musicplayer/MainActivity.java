@@ -2,41 +2,20 @@ package com.example.musicplayer;
 
 import static android.content.ContentValues.TAG;
 
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultCallback;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.media.MediaPlayer;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.provider.DocumentsContract;
-import android.provider.MediaStore;
-import android.provider.OpenableColumns;
-import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.TextView;
 import android.widget.Toast;
-
-import org.json.simple.parser.ParseException;
 
 import java.io.File;
 import java.io.IOException;
@@ -136,9 +115,11 @@ public class MainActivity extends AppCompatActivity {
 
 
         // Just Grabbing our buttons for java code
-        Button selectButton = findViewById(R.id.button);
+        Button selectButton = findViewById(R.id.fileSelectBtn);
         ImageButton stopButton = findViewById(R.id.StopButton);
         ImageButton playButton = findViewById(R.id.playButton);
+        ImageButton skipButton = findViewById(R.id.NextBtn);
+        ImageButton prevButton = findViewById(R.id.previousBtn);
 
 
         // This is what happens when our play button is pressed.
@@ -147,7 +128,6 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 try {
                     if (mp.isPlaying()) {
-                        isMPPlaying = false;
                         mp.pause();
                     } else {
                         mp.start();
@@ -159,6 +139,47 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        //This will skip the song currently playing in our CDLL or throw an error.
+        skipButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                try {
+                    if (mp.isPlaying()) {
+                        mp.reset();
+                        nextSong = nextSong.next;
+                        String pathToPlay = nextSong.song.getPath();
+                        mp.setDataSource(pathToPlay);
+                        mp.prepareAsync();
+                    } else {
+                        toastGeneric("There is no song playing right now.");
+                    }
+
+                } catch (Exception e) {
+                    toastGeneric("There was an error RIP hope it wasn't during a presentation.");
+                }
+            }
+        });
+        // This will play the previous song.
+        prevButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                try {
+                    if (mp.isPlaying()) {
+                        mp.reset();
+                        nextSong = nextSong.previous;
+                        String pathToPlay = nextSong.song.getPath();
+                        mp.setDataSource(pathToPlay);
+                        mp.prepareAsync();
+                    } else {
+                        toastGeneric("There is no song playing right now.");
+                    }
+
+                } catch (Exception e) {
+                    toastGeneric("There was an error RIP hope it wasn't during a presentation.");
+                }
+            }
+        });
+
 
         // Currently unused method for stop button. Ability to Play Sound Removed.
         stopButton.setOnClickListener(new View.OnClickListener() {
@@ -166,7 +187,6 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 try {
                     if (mp.isPlaying()) {
-                        mp.stop();
                         mp.reset();
                     } else {
                         //      toastNothingPlaying("There is nothing playing, try selecting a file!");
@@ -322,6 +342,14 @@ public class MainActivity extends AppCompatActivity {
                 Log.e("path", "empty");
             }
         }
+
+        public void toastGeneric(String textToShow) {
+            Toast.makeText(this, textToShow,
+                    Toast.LENGTH_LONG).show();
+        }
+
+
+
 }
 
 

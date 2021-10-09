@@ -1,6 +1,6 @@
 <resources>
     <string name="main_name">What Goes Around Comes Around</string>
     <string name="second_main_name">Where Every Song is a Circle</string>
-    <string name="select_file_button">Select Folder to Scan</string>
+    <string name="select_file_button">Select Songs</string>
     <string name="parody_banner">Haha Funy</string>
 </resources>
