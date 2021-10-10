@@ -42,6 +42,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
         return parser.getLength();
     }
 
+
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public TextView songTitle;
         public TextView genre;

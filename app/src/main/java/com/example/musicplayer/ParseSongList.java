@@ -97,6 +97,7 @@ public class ParseSongList extends AppCompatActivity {
     public void populateExistingList(ArrayList paths, ArrayList names) {
 
         Log.e("RUNNING PEL", "RUNNING...");
+        Song[] existingSongs = getEntries();
 
         // If API version is > 30, we need to write/read to docs folder, NOT our own.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
@@ -113,7 +114,7 @@ public class ParseSongList extends AppCompatActivity {
             JSONArray jsonArray = (JSONArray) parser.parse(reader);
             //Log.e("OBJECT TEST:", String.valueOf(jsonArray));
 
-            // This for loop iterates over our existing entries andis for testing purposes.
+            // This for loop iterates over our existing entries and is for testing purposes.
             for (int i = 0; i < jsonArray.size(); i++) {
                 String name = jsonArray.get(i).toString();
                 JSONObject jsonObj = (JSONObject) jsonArray.get(i);
@@ -130,8 +131,20 @@ public class ParseSongList extends AppCompatActivity {
                 JSONObject newEntry = new JSONObject();
                 newEntry.put("songTitle", (String) names.get(i));
                 newEntry.put("songPath", (String) paths.get(i));
+                boolean alreadyAdded = false;
+                // Nested for loop checks for duplicates.
+                for(int j = 0; j < existingSongs.length; j++) {
+                    if(newEntry.get("songPath").equals(existingSongs[j].getPath())) {
+                        alreadyAdded = true;
+                        break;
+                    }
+                }
+
                 // Put newEntry into our jsonarray
-                jsonArray.add(newEntry);
+                if(!alreadyAdded) {
+                    jsonArray.add(newEntry);
+                }
+
 
             }
 

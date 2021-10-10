@@ -2,6 +2,7 @@ package com.example.musicplayer;
 
 import static android.content.ContentValues.TAG;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -13,6 +14,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -34,14 +36,6 @@ public class MainActivity extends AppCompatActivity {
     boolean isMPPlaying = false;
     // This is the arraylist of files the user is trying to import. It does NOT STORE SONGS THE USER HAS ALREADY SELECTED.
     ArrayList<String> songs;
-    // Just a code to make sure no errors are returned.
-    private final int REQUEST_CODE_PERMISSIONS = 101;
-
-    // We are storing these to use later.
-    private final String[] REQUIRED_PERMISSIONS = new String[]{
-            "android.permission.WRITE_EXTERNAL_STORAGE",
-            "android.permission.READ_EXTERNAL_STORAGE",
-    };
 
     // The creates our parser so we can use it in the below if/else statements.
     ParseSongList parser = new ParseSongList();
@@ -49,9 +43,7 @@ public class MainActivity extends AppCompatActivity {
     Song[] songArr;
     CyclicDouble CDLList = new CyclicDouble();
     Node nextSong;
-    //   Log.e("TEST CDLL:", CDLList.toString());
 
-    int songCounter = 0;
 
 
 
@@ -69,13 +61,13 @@ public class MainActivity extends AppCompatActivity {
         // Quickly Populates our recycler view song list.
         songArr = parser.getEntries();
         if(songArr != null) {
-            RecyclerView recyclerView = (RecyclerView) findViewById(R.id.songList);
+            RecyclerView recyclerView = findViewById(R.id.songList);
             SongAdapter adapter = new SongAdapter(songArr);
             recyclerView.setHasFixedSize(false);
             recyclerView.setLayoutManager(new LinearLayoutManager(this));
             // Populates our CDLL With songs at startup.
-            for(int i = 0; i < songArr.length; i++) {
-                CDLList.insertNode(songArr[i]);
+            for (Song song : songArr) {
+                CDLList.insertNode(song);
             }
 
             nextSong = CDLList.head;
@@ -88,6 +80,26 @@ public class MainActivity extends AppCompatActivity {
 
         }
 
+        // Set our music player to play on launch if possible.
+        if(CDLList.head!= null) {
+            try {
+                mp.setDataSource(CDLList.head.song.getPath());
+                mp.prepareAsync();
+            } catch (IOException e) {
+            }
+        }
+
+        // Our onPrepared listener allows  the mediaplayer to function
+        // without having to worry about it states.
+        mp.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+            @Override
+            public void onPrepared(MediaPlayer mp) {
+                // Okay so this will start our audio ONCE IT'S READY
+                mp.start();
+                isMPPlaying = true;
+            }
+        });
+
 
 
 
@@ -98,8 +110,14 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onCompletion(MediaPlayer mediaPlayer) {
                         mp.reset();
-                        nextSong = nextSong.next;
+
+                        if(nextSong.next != null) {
+                            nextSong = nextSong.next;
+
+                        }
+
                         String pathToPlay =  nextSong.song.getPath();
+
                         try {
                             mp.setDataSource(pathToPlay);
                             mp.prepareAsync();
@@ -112,8 +130,6 @@ public class MainActivity extends AppCompatActivity {
                 }
 
         );
-
-
 
         // Just Grabbing our buttons for java code
         Button selectButton = findViewById(R.id.fileSelectBtn);
@@ -135,7 +151,7 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                 } catch (Exception e) {
-                    //       toastNothingPlaying("There is nothing playing, try selecting a file!");
+
                 }
             }
         });
@@ -147,7 +163,11 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     if (mp.isPlaying()) {
                         mp.reset();
-                        nextSong = nextSong.next;
+                        // It will throw an error if it can't skip,
+                        // so we need to make sure that the next node exists. :)
+                        if(nextSong.next != null) {
+                            nextSong = nextSong.next;
+                        }
                         String pathToPlay = nextSong.song.getPath();
                         mp.setDataSource(pathToPlay);
                         mp.prepareAsync();
@@ -167,7 +187,11 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     if (mp.isPlaying()) {
                         mp.reset();
-                        nextSong = nextSong.previous;
+                        // Same as above, we need to make sure the previous node
+                        // is not null.
+                        if(nextSong.previous != null) {
+                            nextSong = nextSong.previous;
+                        }
                         String pathToPlay = nextSong.song.getPath();
                         mp.setDataSource(pathToPlay);
                         mp.prepareAsync();
@@ -190,7 +214,8 @@ public class MainActivity extends AppCompatActivity {
                     if (mp.isPlaying()) {
                         mp.reset();
                     } else {
-                        //      toastNothingPlaying("There is nothing playing, try selecting a file!");
+                        mp.setDataSource(CDLList.head.song.getPath());
+                       // mp.prepareAsync();
                     }
 
                 } catch (Exception e) {
@@ -220,17 +245,6 @@ public class MainActivity extends AppCompatActivity {
                     .build()
                     .forResult(Constants.REQ_UNICORN_FILE);
         });
-
-        mp.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-            @Override
-            public void onPrepared(MediaPlayer mp) {
-                // Okay so this will start our audio ONCE IT'S READY
-                mp.start();
-                isMPPlaying = true;
-            }
-        });
-
-
     }
 
 
@@ -267,9 +281,6 @@ public class MainActivity extends AppCompatActivity {
 
 
                 // This is just setting the directory of the folder so we can see if it exists or not.
-                // Support for Android 28+ has been removed. It can easily be added back by adding conditionals here.
-
-
                 // This is the name of the folder we've either created or need to create.
                 String sdkunder29 = "/WGACA/songs.json";
                 String sdkOver29 = "/Documents/songs.json";
@@ -287,22 +298,58 @@ public class MainActivity extends AppCompatActivity {
                 if (directoryToCreate.exists()) {
                     // Populates an existing Directory if it's necessary.
                     Log.e("DIRECTORY EXISTS?: ", "True");
+
+
+                    // This array holds our entries BEFORE we repopulate our list
+                    // with the new entries. This allows us to check for duplicates
+                    // in the following nested for loop below. It's not the most optimized
+                    // thing in the world, but it is relatively straightforward.
+                    Song[] getAllSongsBefore = parser.getEntries();
+                    // This method populates our JSON file
                     parser.populateExistingList(paths, titles);
 
+
+                    // This boolean will help us identify duplicates and keep them out
+                    // of our circular doubly linked list.
+                    boolean alreadyExists = false;
+
+
                     // Ensure that we add our newly selected songs to our CDLL.
+                    // This code should also skip duplicates.
                     for(int i = 0; i < paths.size(); i++) {
-                        CDLList.insertNode(new Song(titles.get(i), paths.get(i)));
-                    //    Log.e("CDLL POPULATED:",CDLList.head.song.getTitle());
+                        for(int j = 0; j < getAllSongsBefore.length;j++ ){
+                            // This inner loop checks our previous json file against the
+                            // songs that were just selected and changes our boolean for us.
+                            if(getAllSongsBefore[j].getPath().equals(paths.get(i))) {
+                                alreadyExists = true;
+                                Log.e("INNER LOOP: " ,"SONG ALREADY EXISTS");
+                            } else {
+                                Log.e("INNER LOOP:", "SONG DOES NOT EXIST");
+                            }
+
+                        }
+                        // If that song already exists in our file, we don't add it.
+                        // Otherwise, we add it to our CDLL.
+                        if(!alreadyExists) {
+                            Log.e("ALREADY EXISTS?: ", "FALSE");
+                            CDLList.insertNode(new Song(titles.get(i),paths.get(i)));
+                        }
+                    // Here we need to reset the boolean variable after the inner loop
+                        // has run so we can check the next song.
+                        alreadyExists = false;
+
+
                     }
+
+                    //    Log.e("CDLL POPULATED:",CDLList.head.song.getTitle());
+
                     // This code will parse our JSON file and reset the recycler view to include all of our added songs.
-                    songArr = parser.getEntries();
+                    Song[] getAllSongsAfter = parser.getEntries();
                     RecyclerView recyclerView = (RecyclerView) findViewById(R.id.songList);
-                    SongAdapter adapter = new SongAdapter(songArr);
+                    SongAdapter adapter = new SongAdapter(getAllSongsAfter);
                     recyclerView.setAdapter(adapter);
 
-
                     // Log.e("POPULATELISTERROR: ", "FOLDER ALREADY EXISTS.");
-
                 } else {
                     // This executes the FIRST TIME our user runs the app and selects files.
                     try {
@@ -326,8 +373,6 @@ public class MainActivity extends AppCompatActivity {
                         Log.e("ERROR IN IO", "IO ERROR IN POPULATE FIRST TIME");
                         Log.e(TAG, e.getMessage());
                     }
-
-
 
                 // This is our for loop to add the new songs to our CDLL.
                 for(int i = 0; i < paths.size(); i++) {
