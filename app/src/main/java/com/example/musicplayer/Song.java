@@ -1,5 +1,8 @@
 package com.example.musicplayer;
 
+import android.media.MediaPlayer;
+import android.provider.MediaStore;
+
 import java.util.ArrayList;
 
 public class Song {
@@ -7,6 +10,7 @@ public class Song {
     private String genre;
     private String artist;
     private String path;
+    private CyclicDoubleInt traversal;
 
     public String getArtist() {
         return artist;
@@ -44,5 +48,16 @@ public class Song {
 
     public void setPath(String path) {
         this.path = path;
+    }
+
+    // Method to populates our traversal CDLL.
+    public void splitSong(MediaPlayer mp) {
+
+    }
+
+    // Method to return the needed time in the traversal CDLL
+    public int getTime(MediaPlayer mp) {
+        return 0;
+
     }
 }

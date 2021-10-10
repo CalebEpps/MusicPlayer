@@ -1,9 +1,9 @@
 package com.example.musicplayer;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -33,6 +33,10 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
         holder.songTitle.setText(song.getTitle());
         holder.genre.setText(song.getGenre());
         holder.artist.setText(song.getArtist());
+
+
+
+
     }
 
     @Override

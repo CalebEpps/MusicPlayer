@@ -1,17 +1,17 @@
 package com.example.musicplayer;
 
-class CyclicDoublePrim<T>{
-   class Node<T>{
-      T data;
+class CyclicDoubleInt{
+   class Node{
+      int data;
       Node previous; //pointer to previous node
       Node next;     //pointer to next node
       
-      public Node(T data){
+      public Node(int data){
          this.data = data;
          next = previous = null;
       }
       
-      public Node(T data, Node next, Node previous){
+      public Node(int data, Node next, Node previous){
          this.data = data;
          this.next = next;
          this.previous = previous;
@@ -21,21 +21,21 @@ class CyclicDoublePrim<T>{
    //initially head is set to null
    Node head = null;
    
-   public void insertNode(T data){
+   public void insertNode(int data){
       
       if(head == null){
-         head = new Node<T>(data);
+         head = new Node(data);
       }
       
       else if(head.next == null){
-         Node<T> node = new Node<T>(data, head, head);
+         Node node = new Node(data, head, head);
          head.next = head.previous = node;
          
       }
       
       else{
-         Node<T> node = new Node<T>(data, head, head.previous);
-         Node<T> temp = head.previous;
+         Node node = new Node(data, head, head.previous);
+         Node temp = head.previous;
          temp.next = node;
          head.previous = node;
                   
@@ -68,7 +68,7 @@ class CyclicDoublePrim<T>{
          return "[" + head.data + "]";
 
       String str = "[";
-      Node<T> current = head;
+      Node current = head;
 
       do{
          str += current.data + ", ";

@@ -34,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
     MediaPlayer mp = new MediaPlayer();
     // Boolean for mediaplayer, currently not used due to no ability to play music (Removed for testing)
     boolean isMPPlaying = false;
+    boolean isMPStopped = false;
     // This is the arraylist of files the user is trying to import. It does NOT STORE SONGS THE USER HAS ALREADY SELECTED.
     ArrayList<String> songs;
 
@@ -96,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
             public void onPrepared(MediaPlayer mp) {
                 // Okay so this will start our audio ONCE IT'S READY
                 mp.start();
-                isMPPlaying = true;
+              //  isMPPlaying = true;
             }
         });
 
@@ -146,8 +147,19 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     if (mp.isPlaying()) {
                         mp.pause();
+                        isMPStopped = false;
                     } else {
-                        mp.start();
+                        if(!isMPStopped) {
+                         //   Log.e("MP PLAY BTN", "MP PLAY BUTTON KNEW MP WAS NOT STOPPED");
+                            mp.start();
+                        } else {
+                         //   Log.e("MP PLAY BUTTON","MP PLAY BUTTON SAYS MP WAS STOPPED");
+                            String pathToPlay = nextSong.song.getPath();
+                            mp.setDataSource(pathToPlay);
+                            mp.prepareAsync();
+                            isMPStopped = false;
+                        }
+
                     }
 
                 } catch (Exception e) {
@@ -213,9 +225,9 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     if (mp.isPlaying()) {
                         mp.reset();
+                        isMPStopped = true;
+                        nextSong = CDLList.head;
                     } else {
-                        mp.setDataSource(CDLList.head.song.getPath());
-                       // mp.prepareAsync();
                     }
 
                 } catch (Exception e) {
