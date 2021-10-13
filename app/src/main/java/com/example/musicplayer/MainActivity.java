@@ -42,6 +42,8 @@ public class MainActivity extends AppCompatActivity {
     ParseSongList parser = new ParseSongList();
     // This is our array of songs for the recyclerView
     Song[] songArr;
+
+
     CyclicDouble CDLList = new CyclicDouble();
     Node nextSong;
 
