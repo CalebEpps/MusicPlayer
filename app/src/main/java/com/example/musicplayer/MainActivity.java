@@ -154,6 +154,7 @@ public class MainActivity extends AppCompatActivity {
                 nextSong.song.fastFoward();
                  mp.seekTo(nextSong.song.ffNode.data);
                 Log.e("CURRENT MP TIME", String.valueOf(mp.getCurrentPosition()));
+                toastGeneric("The Current Time of the Song is: " + String.valueOf(mp.getCurrentPosition() / 1000) + " seconds.");
             }
         });
 
@@ -193,6 +194,7 @@ public class MainActivity extends AppCompatActivity {
                 nextSong.song.rewind();
                 mp.seekTo(nextSong.song.rewindNode.data);
                 Log.e("CURRENT MP TIME", String.valueOf(mp.getCurrentPosition()));
+                toastGeneric("The Current Time of the Song is: " + String.valueOf(mp.getCurrentPosition() / 1000) + " seconds.");
             }
         });
 
