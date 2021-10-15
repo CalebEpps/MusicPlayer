@@ -2,23 +2,21 @@ package com.example.musicplayer;
 
 import static android.content.ContentValues.TAG;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.Toast;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.io.File;
 import java.io.IOException;
@@ -46,6 +44,9 @@ public class MainActivity extends AppCompatActivity {
 
     CyclicDouble CDLList = new CyclicDouble();
     Node nextSong;
+    CyclicDoubleInt.IntNode tempNode;
+
+    String[] filters = {"mp3","ogg","wav","m4a"};
 
 
 
@@ -140,6 +141,62 @@ public class MainActivity extends AppCompatActivity {
         ImageButton playButton = findViewById(R.id.playButton);
         ImageButton skipButton = findViewById(R.id.NextBtn);
         ImageButton prevButton = findViewById(R.id.previousBtn);
+        ImageButton ffBtn = findViewById(R.id.FFBtn);
+        ImageButton rewBtn = findViewById(R.id.rewBtn);
+
+        ffBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                nextSong.song.populateFastFoward(mp);
+               // Log.e("CURRENT MP TIME", String.valueOf(mp.getCurrentPosition()));
+                Log.e("FF NODE TIME", String.valueOf(nextSong.song.ffNode.data));
+              //  Log.e("FFBTN", String.valueOf(mp.getDuration()));
+                nextSong.song.fastFoward();
+                 mp.seekTo(nextSong.song.ffNode.data);
+                Log.e("CURRENT MP TIME", String.valueOf(mp.getCurrentPosition()));
+            }
+        });
+
+        ffBtn.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                nextSong.song.fastForward.deleteAllNodes();
+                nextSong.song.populateFastFoward(mp);
+                nextSong.song.fastFoward();
+                mp.seekTo(nextSong.song.ffNode.data);
+                return true;
+            }
+
+        });
+
+        rewBtn.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                nextSong.song.rewind.deleteAllNodes();
+                nextSong.song.populateRewind(mp);
+                nextSong.song.rewind();
+                mp.seekTo(nextSong.song.rewindNode.data);
+                return true;
+            }
+
+        });
+
+
+
+        rewBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+              //  Log.e("CURRENT MP TIME", String.valueOf(mp.getCurrentPosition()));
+                nextSong.song.populateRewind(mp);
+                Log.e("RW NODE TIME", String.valueOf(nextSong.song.rewindNode.data));
+              //  Log.e("RWBTN", String.valueOf(mp.getDuration()));
+                nextSong.song.rewind();
+                mp.seekTo(nextSong.song.rewindNode.data);
+                Log.e("CURRENT MP TIME", String.valueOf(mp.getCurrentPosition()));
+            }
+        });
+
+
 
 
         // This is what happens when our play button is pressed.
@@ -255,6 +312,7 @@ public class MainActivity extends AppCompatActivity {
                     .setRootDirectory(Environment.getExternalStorageDirectory().getAbsolutePath())
                     .showHiddenFiles(false)
                     .addItemDivider(true)
+                    .setFilters(filters)
                     .theme(R.style.UnicornFilePicker_Default)
                     .build()
                     .forResult(Constants.REQ_UNICORN_FILE);

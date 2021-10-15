@@ -1,7 +1,7 @@
 package com.example.musicplayer;
 
 import android.media.MediaPlayer;
-import android.provider.MediaStore;
+import android.util.Log;
 
 import java.util.ArrayList;
 
@@ -10,7 +10,11 @@ public class Song {
     private String genre;
     private String artist;
     private String path;
-    private CyclicDoubleInt traversal = new CyclicDoubleInt();
+    protected CyclicDoubleInt fastForward = new CyclicDoubleInt();
+    protected CyclicDoubleInt rewind = new CyclicDoubleInt();
+    protected CyclicDoubleInt.IntNode ffNode;
+    protected CyclicDoubleInt.IntNode rewindNode;
+    protected int currentTime = 0;
 
     public String getArtist() {
         return artist;
@@ -51,23 +55,45 @@ public class Song {
     }
 
     // Method to populates our traversal CDLL.
-    public CyclicDoubleInt splitSong(MediaPlayer mp) {
-        int totalTime = getTotalTime(mp);
-        CyclicDoubleInt dividedSong = new CyclicDoubleInt();
-        int temp = 0;
-        while(temp <= totalTime) {
-            if(temp + 30 > totalTime) {
-                break;
+    public void populateFastFoward(MediaPlayer mp) {
+        if(fastForward.head == null) {
+        FormulaDivide fd = new FormulaDivide();
+        currentTime = mp.getCurrentPosition();
+        ArrayList<Integer> tempList = fd.FFFormula(mp.getDuration(),currentTime);
+        for(int i = 0; i < tempList.size(); i++) {
+            fastForward.insertNode(tempList.get(i));
             }
-          dividedSong.insertNode(temp);
-          temp += 30;
+            ffNode = fastForward.head;
         }
-        return dividedSong;
     }
 
-    // Method to return the needed time in the traversal CDLL
-    public int getTotalTime(MediaPlayer mp) {
-        return mp.getDuration();
+    public void populateRewind(MediaPlayer mp) {
 
+        if(rewind.head == null) {
+            FormulaDivide fd = new FormulaDivide();
+            currentTime = mp.getCurrentPosition();
+            ArrayList<Integer> tempList = fd.RRformula(mp.getDuration(),currentTime);
+            for(int i = 0; i < tempList.size(); i++) {
+                rewind.insertNode(tempList.get(i));
+            }
+            rewindNode= rewind.head;
+        }
+    }
+
+
+    // Method to return the needed time in the traversal CDLL
+    public int getTime(MediaPlayer mp) {
+        return 0;
+
+    }
+
+    public void fastFoward() {
+    //    Log.e("FAST FORWARD TO", String.valueOf(ffNode.data));
+        ffNode = ffNode.next;
+        //ffNode.next.data
+    }
+
+    public void rewind() {
+        rewindNode = rewindNode.previous;
     }
 }

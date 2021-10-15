@@ -1,17 +1,17 @@
 package com.example.musicplayer;
 
 class CyclicDoubleInt{
-   class Node{
+   class IntNode {
       int data;
-      Node previous; //pointer to previous node
-      Node next;     //pointer to next node
+      IntNode previous; //pointer to previous node
+      IntNode next;     //pointer to next node
       
-      public Node(int data){
+      public IntNode(int data){
          this.data = data;
          next = previous = null;
       }
       
-      public Node(int data, Node next, Node previous){
+      public IntNode(int data, IntNode next, IntNode previous){
          this.data = data;
          this.next = next;
          this.previous = previous;
@@ -19,27 +19,44 @@ class CyclicDoubleInt{
    }
    
    //initially head is set to null
-   Node head = null;
+   IntNode head = null;
    
    public void insertNode(int data){
       
       if(head == null){
-         head = new Node(data);
+         head = new IntNode(data);
       }
       
       else if(head.next == null){
-         Node node = new Node(data, head, head);
+         IntNode node = new IntNode(data, head, head);
          head.next = head.previous = node;
          
       }
       
       else{
-         Node node = new Node(data, head, head.previous);
-         Node temp = head.previous;
+         IntNode node = new IntNode(data, head, head.previous);
+         IntNode temp = head.previous;
          temp.next = node;
          head.previous = node;
                   
       }
+   }
+
+   public void deleteAllNodes() {
+      if(head != null) {
+         IntNode temp, current;
+         current = head.next;
+
+         while (current != head) {
+            temp = current.next;
+            current = null;
+            current = temp;
+         }
+         head = null;
+
+      }
+
+
    }
    
    /*public void printList() {
@@ -68,7 +85,7 @@ class CyclicDoubleInt{
          return "[" + head.data + "]";
 
       String str = "[";
-      Node current = head;
+      IntNode current = head;
 
       do{
          str += current.data + ", ";
