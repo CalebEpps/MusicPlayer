@@ -12,6 +12,9 @@ public class ViewSongAcitivty extends AppCompatActivity {
         setContentView(R.layout.activity_view_song_acitivty);
 
 
+        ParseSongList parser = new ParseSongList();
+        //ArrayList
+
 
 
 

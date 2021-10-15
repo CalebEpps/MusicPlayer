@@ -11,7 +11,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -159,10 +158,10 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 nextSong.song.populateFastFoward(mp);
                // Log.e("CURRENT MP TIME", String.valueOf(mp.getCurrentPosition()));
-                Log.e("FF NODE TIME", String.valueOf(nextSong.song.ffNode.data));
+                Log.e("FF NODE TIME", String.valueOf(nextSong.song.seekToNode.data));
               //  Log.e("FFBTN", String.valueOf(mp.getDuration()));
                 nextSong.song.fastFoward();
-                 mp.seekTo(nextSong.song.ffNode.data);
+                 mp.seekTo(nextSong.song.seekToNode.data);
                 Log.e("CURRENT MP TIME", String.valueOf(mp.getCurrentPosition()));
                 toastGeneric("The Current Time of the Song is: " + String.valueOf(mp.getCurrentPosition() / 1000) + " seconds.");
             }
@@ -172,10 +171,10 @@ public class MainActivity extends AppCompatActivity {
         ffBtn.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
-                nextSong.song.fastForward.deleteAllNodes();
+                nextSong.song.skipTimeCDLL.deleteAllNodes();
                 nextSong.song.populateFastFoward(mp);
                 nextSong.song.fastFoward();
-                mp.seekTo(nextSong.song.ffNode.data);
+                mp.seekTo(nextSong.song.seekToNode.data);
                 return true;
             }
 
@@ -184,10 +183,10 @@ public class MainActivity extends AppCompatActivity {
         rewBtn.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
-                nextSong.song.rewind.deleteAllNodes();
+                nextSong.song.skipTimeCDLL.deleteAllNodes();
                 nextSong.song.populateRewind(mp);
                 nextSong.song.rewind();
-                mp.seekTo(nextSong.song.rewindNode.data);
+                mp.seekTo(nextSong.song.seekToNode.data);
                 return true;
             }
 
@@ -200,10 +199,10 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
               //  Log.e("CURRENT MP TIME", String.valueOf(mp.getCurrentPosition()));
                 nextSong.song.populateRewind(mp);
-                Log.e("RW NODE TIME", String.valueOf(nextSong.song.rewindNode.data));
+                Log.e("RW NODE TIME", String.valueOf(nextSong.song.seekToNode.data));
               //  Log.e("RWBTN", String.valueOf(mp.getDuration()));
                 nextSong.song.rewind();
-                mp.seekTo(nextSong.song.rewindNode.data);
+                mp.seekTo(nextSong.song.seekToNode.data);
                 Log.e("CURRENT MP TIME", String.valueOf(mp.getCurrentPosition()));
                 toastGeneric("The Current Time of the Song is: " + String.valueOf(mp.getCurrentPosition() / 1000) + " seconds.");
             }
@@ -341,8 +340,10 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == Constants.REQ_UNICORN_FILE && resultCode == RESULT_OK) {
             if (data != null) {
                 // Two important arraylists for populating our JSON file.
-                ArrayList<String> titles = new ArrayList<String>();
-                ArrayList<String> paths = new ArrayList<String>();
+                ArrayList<String> titles = new ArrayList<>();
+                ArrayList<String> paths = new ArrayList<>();
+                ArrayList<String> artists = new ArrayList<>();
+                ArrayList<String> genres = new ArrayList<>();
                 // This just gets all of the files that were returned from the previous activity.
                 songs = data.getStringArrayListExtra("filePaths");
                 // Counter. Unused Variable
@@ -358,7 +359,13 @@ public class MainActivity extends AppCompatActivity {
                     String songName = realFile.getName().replace(".mp3", "");
                     // Adds the song's name to our titles list. VERY important.
                     titles.add(songName);
+                    // These just add the necessary artist and genre fields so we can create our song objects.
+                    artists.add("No Artist Assigned");
+                    genres.add("No Genre Assigned");
                     Log.e("FILE NAME: ", songName);
+
+
+
                     // Unused Incremented Variable
                     counter++;
                 }
@@ -391,7 +398,7 @@ public class MainActivity extends AppCompatActivity {
                     // thing in the world, but it is relatively straightforward.
                     Song[] getAllSongsBefore = parser.getEntries();
                     // This method populates our JSON file
-                    parser.populateExistingList(paths, titles);
+                    parser.populateExistingList(paths, titles, artists, genres);
 
 
                     // This boolean will help us identify duplicates and keep them out
@@ -438,7 +445,7 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     // This executes the FIRST TIME our user runs the app and selects files.
                     try {
-                        parser.populateListFirstTime(paths, titles);
+                        parser.populateListFirstTime(paths, titles, artists, genres);
                         Log.e("ITEMS: ", String.valueOf(parser.getLength()));
                         Log.e("POPULATELISTSUCCESS", "FILES ADDED TO JSON FILE SUCCESSFULLY (FIRST TIME RUN)");
 

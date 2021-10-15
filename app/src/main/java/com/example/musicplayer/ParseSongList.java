@@ -32,7 +32,7 @@ public class ParseSongList extends AppCompatActivity {
 
     }
 
-    public void populateListFirstTime(ArrayList paths, ArrayList names) throws IOException {
+    public void populateListFirstTime(ArrayList paths, ArrayList names, ArrayList artists, ArrayList genres) throws IOException {
 
         // Check to see if we've reached this part of the method.
         Log.e("NEW JSON FILE?", "TRUE");
@@ -96,7 +96,7 @@ public class ParseSongList extends AppCompatActivity {
     }
 
     // This method is run if the file 'songs.json' already exists in our user's directory.
-    public void populateExistingList(ArrayList paths, ArrayList names) {
+    public void populateExistingList(ArrayList paths, ArrayList names, ArrayList artists, ArrayList genres) {
 
         Log.e("RUNNING PEL", "RUNNING...");
         Song[] existingSongs = getEntries();
@@ -131,10 +131,10 @@ public class ParseSongList extends AppCompatActivity {
                 // Log.e("NEW JSON LOOP?", "TRUE");
                 // Temp JSON Object to hold our data
                 JSONObject newEntry = new JSONObject();
-                newEntry.put("songTitle", (String) names.get(i));
-                newEntry.put("songPath", (String) paths.get(i));
-                newEntry.put("artist", "No Artist Found");
-                newEntry.put("genre", "No Genre Assigned");
+                newEntry.put("songTitle", names.get(i));
+                newEntry.put("songPath", paths.get(i));
+                newEntry.put("artist",  artists.get(i));
+                newEntry.put("genre", genres.get(i));
                 boolean alreadyAdded = false;
                 // Nested for loop checks for duplicates.
                 for(int j = 0; j < existingSongs.length; j++) {
@@ -248,7 +248,7 @@ public class ParseSongList extends AppCompatActivity {
             //Log.e("OBJECT TEST:", String.valueOf(jsonArray));
             for (int i = 0; i < songs.length; i++) {
                 JSONObject jsonObj = (JSONObject) jsonArray.get(i);
-                songs[i] = new Song(jsonObj.get("songTitle").toString(),jsonObj.get("songPath").toString());
+                songs[i] = new Song(jsonObj.get("songTitle").toString(),jsonObj.get("songPath").toString(),jsonObj.get("artist").toString(),jsonObj.get("genre").toString());
                //    Log.e("PARSE METHOD:", songs[i].getTitle());
                 //    Log.e("OBJECT TEST:", name);
             }
