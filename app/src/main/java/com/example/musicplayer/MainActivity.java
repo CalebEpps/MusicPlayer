@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -41,12 +42,14 @@ public class MainActivity extends AppCompatActivity {
     // This is our array of songs for the recyclerView
     Song[] songArr;
 
-
+// This is our CDLL that we use to do... Most everything. :D
     CyclicDouble CDLList = new CyclicDouble();
     Node nextSong;
     CyclicDoubleInt.IntNode tempNode;
-
+// Only allows the user to choose popular audio file types.
     String[] filters = {"mp3","ogg","wav","m4a"};
+// This boolean is no longer used. It WAS being used for testing purposes regarding the rw and ff functionality
+    boolean progressEnable = true;
 
 
 
@@ -73,13 +76,14 @@ public class MainActivity extends AppCompatActivity {
             for (Song song : songArr) {
                 CDLList.insertNode(song);
             }
-
+// Is there already a song in our CDLL? Cool fuckin' play that shit.
             nextSong = CDLList.head;
 
             Log.e("DID POPULATE?:",CDLList.toString());
 
             recyclerView.setAdapter(adapter);
         } else {
+            // RIP There aren't any songs which means this is a first time load.
             // Nothing will happen here leaving our CDLL null;
 
         }
@@ -88,6 +92,8 @@ public class MainActivity extends AppCompatActivity {
         if(CDLList.head!= null) {
             try {
                 mp.setDataSource(CDLList.head.song.getPath());
+                // We don't need to call mp.start because we do that fancy shit in our onPrepared listener below.
+                // MAYBE SOME OF THIS SPAGHETTI CODE IS EFFICIENT AFTER ALL.
                 mp.prepareAsync();
             } catch (IOException e) {
             }
@@ -99,6 +105,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onPrepared(MediaPlayer mp) {
                 // Okay so this will start our audio ONCE IT'S READY
+                toastGeneric("The Total Time for this Track is: " + mp.getDuration() / 1000 + " Seconds.");
                 mp.start();
               //  isMPPlaying = true;
             }
@@ -135,7 +142,7 @@ public class MainActivity extends AppCompatActivity {
 
         );
 
-        // Just Grabbing our buttons for java code
+        // Just Grabbing our buttons for java code. Don't mind it.
         Button selectButton = findViewById(R.id.fileSelectBtn);
         ImageButton stopButton = findViewById(R.id.StopButton);
         ImageButton playButton = findViewById(R.id.playButton);
@@ -144,6 +151,9 @@ public class MainActivity extends AppCompatActivity {
         ImageButton ffBtn = findViewById(R.id.FFBtn);
         ImageButton rewBtn = findViewById(R.id.rewBtn);
 
+// Fast forward button... Fast forwards. BUT IT ALSO USES A CDLL TO DO SO, COOL STUFF HUH?
+        // ONLY TOOK LIKE 12 HOURS OF BLOOD, TEARS, AND HIGH CHOLESTEROL TO GET IT TO WORK.
+        // FINNICKY ASS JAVA.
         ffBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -157,7 +167,8 @@ public class MainActivity extends AppCompatActivity {
                 toastGeneric("The Current Time of the Song is: " + String.valueOf(mp.getCurrentPosition() / 1000) + " seconds.");
             }
         });
-
+// this is the loooooong click listener. press the button, it clears the fast forward CDLL and makes a new one.
+        // CDLLs reproduce by long clicking.
         ffBtn.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
@@ -169,7 +180,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
         });
-
+// See above, I'm not typing it again.
         rewBtn.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
@@ -183,7 +194,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-
+// See above, I'm not typing it again.
         rewBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
