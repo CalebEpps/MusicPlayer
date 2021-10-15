@@ -23,21 +23,17 @@ public class SplashScreen extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.splash_layout);
-
+        // This is the code for the fade out animation
         AlphaAnimation fadeOut = new AlphaAnimation(1.0f, 0.0f);
         fadeOut.setDuration(500);
         ImageView tttLogo = (ImageView) findViewById(R.id.tttLogo);
 
-
+        // This is the code for the Fade In Animation that plays first.
+        // Notice we start this animation right away.
+        // The fade out animation is delayed for a few seconds and then started.
         AlphaAnimation fadeIn = new AlphaAnimation(0.0f, 1.0f);
         fadeIn.setDuration(1500);
         tttLogo.startAnimation(fadeIn);
-
-
-
-
-
-
 
         fadeOut.setAnimationListener(new Animation.AnimationListener() {
             @Override
@@ -80,7 +76,7 @@ public class SplashScreen extends AppCompatActivity {
 
 
         handler = new Handler();
-
+// This code tells our program to delay the animation starting for a few seconds.
         handler.postDelayed(new Runnable() {
 
             @Override
@@ -89,7 +85,7 @@ public class SplashScreen extends AppCompatActivity {
             }
         }, 4000);
 
-
+// This code tells our program to delay the main activity's launch for a few seconds.
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {

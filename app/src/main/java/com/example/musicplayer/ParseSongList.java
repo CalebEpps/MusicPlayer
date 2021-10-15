@@ -44,6 +44,8 @@ public class ParseSongList extends AppCompatActivity {
             JSONObject newEntry = new JSONObject();
             newEntry.put("songTitle", (String) names.get(i));
             newEntry.put("songPath", (String) paths.get(i));
+            newEntry.put("artist", "No Artist Found");
+            newEntry.put("genre", "No Genre Assigned");
             // Put newEntry into our jsonarray
             jsonArray.add(newEntry);
 
@@ -131,6 +133,8 @@ public class ParseSongList extends AppCompatActivity {
                 JSONObject newEntry = new JSONObject();
                 newEntry.put("songTitle", (String) names.get(i));
                 newEntry.put("songPath", (String) paths.get(i));
+                newEntry.put("artist", "No Artist Found");
+                newEntry.put("genre", "No Genre Assigned");
                 boolean alreadyAdded = false;
                 // Nested for loop checks for duplicates.
                 for(int j = 0; j < existingSongs.length; j++) {

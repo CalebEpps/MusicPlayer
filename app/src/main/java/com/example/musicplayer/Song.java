@@ -15,6 +15,7 @@ public class Song {
     protected CyclicDoubleInt.IntNode ffNode;
     protected CyclicDoubleInt.IntNode rewindNode;
     protected int currentTime = 0;
+    ParseSongList parser = new ParseSongList();
 
     public String getArtist() {
         return artist;
@@ -29,6 +30,14 @@ public class Song {
         this.title = title;
 
     }
+
+    public Song(String title, String path, String artist, String genre) {
+        this.title = title;
+        this.path = path;
+        this.artist = artist;
+        this.genre = genre;
+    }
+
 
     public String getTitle() {
         return title;
