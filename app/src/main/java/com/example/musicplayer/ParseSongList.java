@@ -25,7 +25,6 @@ import java.util.Iterator;
 
 public class ParseSongList extends AppCompatActivity {
 
-    protected ArrayList<Song> songList = new ArrayList<>();
     String filePathEnd = "";
 
     public ParseSongList() {
@@ -83,16 +82,6 @@ public class ParseSongList extends AppCompatActivity {
             outputStream.close();
 
         }
-/*        // Initialize our JSON file and output stream. This will allow us to write to our file.
-        File initJSONFile = new File(Environment.getExternalStorageDirectory(), filePathEnd);
-        FileOutputStream outputStream = new FileOutputStream(initJSONFile + "/songs.json");
-        byte[] strToBytes = jsonArray.toString().getBytes("utf-8");
-        // Here we just write the bytes of our jsonarray to our output file.
-        outputStream.write(strToBytes);
-        // Close the output file. :)
-        outputStream.close();*/
-
-
     }
 
     // This method is run if the file 'songs.json' already exists in our user's directory.
@@ -151,18 +140,6 @@ public class ParseSongList extends AppCompatActivity {
 
 
             }
-
-/*            for(int i = 0; i < jsonArray.size(); i++) {
-                JSONObject jsonObj = (JSONObject) jsonArray.get(i);
-                String jsonStr = (String) jsonObj.get("songPath");
-                for(int j = 0; j < jsonArray.size(); j++ ) {
-                    JSONObject jsonObj2 = (JSONObject) jsonArray.get(j);
-                    String jsonStr2 = (String) jsonObj2.get("songPath");
-                    if(jsonStr.equals(jsonStr2)) {
-                        jsonArray.remove(jsonObj2);
-                    }
-                }
-            }*/
 
             File initJSONFile = new File(Environment.getExternalStorageDirectory(), filePathEnd);
             FileOutputStream outputStream = new FileOutputStream(initJSONFile + "/songs.json");

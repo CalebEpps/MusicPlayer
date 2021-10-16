@@ -2,6 +2,7 @@ package com.example.musicplayer;
 import static android.content.ContentValues.TAG;
 
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.res.AssetFileDescriptor;
 import android.media.MediaPlayer;
 import android.os.Bundle;
@@ -17,12 +18,19 @@ import androidx.appcompat.app.AppCompatActivity;
 
 
 public class SplashScreen extends AppCompatActivity {
+
+
     Handler handler;
+    MediaPlayer mp = new MediaPlayer();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.splash_layout);
+// This code locks the phone in portrait mode because FUCK THE INSTANCE STATE STUFF I DON'T HAVE TIME TO IMPLEMENT IT
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
+
         // This is the code for the fade out animation
         AlphaAnimation fadeOut = new AlphaAnimation(1.0f, 0.0f);
         fadeOut.setDuration(500);
@@ -53,7 +61,7 @@ public class SplashScreen extends AppCompatActivity {
         });
 
 
-        MediaPlayer mp = new MediaPlayer();
+
         try {
             // This code opens our mp3 to play at startup from the assets folder.
             AssetFileDescriptor descriptor = this.getAssets().openFd("startup_sound.mp3");
@@ -72,6 +80,13 @@ public class SplashScreen extends AppCompatActivity {
             }
         });
 
+        mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mediaPlayer) {
+                mp.release();
+            }
+        });
+
 
 
 
@@ -83,7 +98,7 @@ public class SplashScreen extends AppCompatActivity {
             public void run() {
                 tttLogo.startAnimation(fadeOut);
             }
-        }, 4000);
+        }, 6000);
 
 // This code tells our program to delay the main activity's launch for a few seconds.
         handler.postDelayed(new Runnable() {
@@ -93,7 +108,7 @@ public class SplashScreen extends AppCompatActivity {
                 startActivity(intent);
                 finish();
             }
-        }, 5000);
+        }, 7000);
 
     }
 }

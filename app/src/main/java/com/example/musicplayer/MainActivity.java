@@ -3,6 +3,7 @@ package com.example.musicplayer;
 import static android.content.ContentValues.TAG;
 
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
@@ -50,21 +51,17 @@ public class MainActivity extends AppCompatActivity {
 // This boolean is no longer used. It WAS being used for testing purposes regarding the rw and ff functionality
     boolean progressEnable = true;
 
-
-
-
-
-
-
     // onCreate Method for doing... Everything?
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+// This code locks the phone in portrait mode because FUCK THE INSTANCE STATE STUFF I DON'T HAVE TIME TO IMPLEMENT IT
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
 
 
-        // Quickly Populates our recycler view song list.
+        // Quickly Populates our recycler view song list... IIIIIIIF there are entries
         songArr = parser.getEntries();
         if(songArr != null) {
             RecyclerView recyclerView = findViewById(R.id.songList);

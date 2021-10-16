@@ -5,11 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".SplashScreen"
-    android:fromAlpha="1.0"
-    android:toAlpha="0.0"
-    android:duration="1000"
-    android:repeatCount="infinite"
-    android:repeatMode="reverse">
+    android:screenOrientation="portrait">
 
     <ImageView
         android:id="@+id/tttLogo"
