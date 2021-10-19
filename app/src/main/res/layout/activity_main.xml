@@ -122,6 +122,7 @@
         tools:ignore="SpeakableTextPresentCheck" />
 
     <TextView
+        android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/version"
@@ -154,5 +155,17 @@
         app:layout_constraintVertical_bias="0.22000003"
         app:srcCompat="@android:drawable/ic_media_rew"
         tools:ignore="SpeakableTextPresentCheck" />
+
+    <ImageView
+        android:id="@+id/rotatingAds"
+        android:layout_width="418dp"
+        android:layout_height="128dp"
+        android:scaleX="3"
+        android:scaleY="3"
+        app:layout_constraintBottom_toTopOf="@+id/textView2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:srcCompat="@mipmap/ad_banner_one_foreground" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

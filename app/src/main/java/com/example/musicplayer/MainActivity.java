@@ -4,14 +4,17 @@ import static android.content.ContentValues.TAG;
 
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -51,6 +54,17 @@ public class MainActivity extends AppCompatActivity {
 // This boolean is no longer used. It WAS being used for testing purposes regarding the rw and ff functionality
     boolean progressEnable = true;
 
+
+    // WARNING THIS CODE HAS NOT BEEN TESTED. NO USB CABLE AVAILABLE.
+    Handler handler = new Handler();
+    CyclicDoubleStr CDLLStr = new CyclicDoubleStr();
+    ImageView adBanner = findViewById(R.id.rotatingAds);
+    int  adBannerCounter = 0;
+
+
+
+
+
     // onCreate Method for doing... Everything?
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +72,37 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 // This code locks the phone in portrait mode because FUCK THE INSTANCE STATE STUFF I DON'T HAVE TIME TO IMPLEMENT IT
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+// WARNING UNTESTEDCODE
+        int[] adBannerPaths = {R.drawable.ad_banner_one_background,R.drawable.ad_banner_two_background, R.drawable.ad_banner_three_background};
+
+// WARNING THIS CODE HAS NOT BEEN TESTED YET. NO USB CABLE AVAILABLE
+
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                // Insert custom code here
+                if(adBannerCounter <= 2) {
+                    adBanner.setImageDrawable(getResources().getDrawable(adBannerPaths[adBannerCounter]));
+                    adBannerCounter++;
+                   // handler.postDelayed(runnable, 2000);
+                } else {
+                    adBannerCounter = 0;
+                }
+
+            }
+        };
+
+        /* REFERENCE CODE
+            final Handler handler = new Handler();
+    handler.postDelayed(new Runnable() {
+        public void run() {
+            int randomNum = random.nextInt(6);
+            dice.setImageResource(images[randomNum]);
+            handler.postDelayed(this, 500);
+        }
+    }, 500);
+
+         */
 
 
 
@@ -488,7 +533,7 @@ public class MainActivity extends AppCompatActivity {
 
         public void toastGeneric(String textToShow) {
             Toast.makeText(this, textToShow,
-                    Toast.LENGTH_LONG).show();
+                    Toast.LENGTH_SHORT).show();
         }
 
 

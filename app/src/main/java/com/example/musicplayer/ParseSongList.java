@@ -140,7 +140,8 @@ public class ParseSongList extends AppCompatActivity {
 
 
             }
-
+// This method is currently not implemented, but it checks for duplicates in our json array
+            // before writing it to the file.
             File initJSONFile = new File(Environment.getExternalStorageDirectory(), filePathEnd);
             FileOutputStream outputStream = new FileOutputStream(initJSONFile + "/songs.json");
             byte[] strToBytes = jsonArray.toString().getBytes("utf-8");
