@@ -84,9 +84,13 @@ public class MainActivity extends AppCompatActivity {
                 if(adBannerCounter <= 2) {
                     adBanner.setImageDrawable(getResources().getDrawable(adBannerPaths[adBannerCounter]));
                     adBannerCounter++;
+                    // This code is NOT WORKING, TRY CREATING THE RUNNABLE AND HANDLER IN CLASS
+                    // AND THEN MAKE THE BeloW CODE WHERE IT CHANGES THE IMAGE INTO A METHOD
                    // handler.postDelayed(runnable, 2000);
                 } else {
                     adBannerCounter = 0;
+                    adBanner.setImageDrawable(getResources().getDrawable(adBannerPaths[adBannerCounter]));
+                    adBannerCounter++;
                 }
 
             }
