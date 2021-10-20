@@ -54,9 +54,7 @@ public class MainActivity extends AppCompatActivity {
     boolean progressEnable = true;
 
 
-    // WARNING THIS CODE HAS NOT BEEN TESTED. NO USB CABLE AVAILABLE.
     Handler handler = new Handler();
-    CyclicDoubleStr CDLLStr = new CyclicDoubleStr();
     ImageView adBanner;
 
     // These variables are used to process and run the ad banners. :)
@@ -86,15 +84,19 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         // This code locks the phone in portrait mode because FUCK THE INSTANCE STATE STUFF I DON'T HAVE TIME TO IMPLEMENT IT
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
         // Initialize our ad banner variable
         adBanner = findViewById(R.id.rotatingAds);
 
         // For loop that populates our like... 22nd CDLL at this point.
+        // REMEMBER: R.id.* are all integers. We re-use our Int CDLL.
         for(int i = 0; i < adBannerPaths.length; i++) {
             adBannerCDLL.insertNode(adBannerPaths[i]);
         }
+        // Set the first ad to the head of our CDLL.
         currentAd = adBannerCDLL.head;
         // This asyncronously runs our delayed code to cycle the CDLL of our ad banners.
         handler.postDelayed(runnable,0);
