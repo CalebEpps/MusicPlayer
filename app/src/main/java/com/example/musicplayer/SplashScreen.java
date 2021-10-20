@@ -15,6 +15,8 @@ import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.github.florent37.viewanimator.ViewAnimator;
+
 
 public class SplashScreen extends AppCompatActivity {
 
@@ -28,12 +30,16 @@ public class SplashScreen extends AppCompatActivity {
         setContentView(R.layout.splash_layout);
 // This code locks the phone in portrait mode because FUCK THE INSTANCE STATE STUFF I DON'T HAVE TIME TO IMPLEMENT IT
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-
-
         // This is the code for the fade out animation
         AlphaAnimation fadeOut = new AlphaAnimation(1.0f, 0.0f);
         fadeOut.setDuration(500);
         ImageView tttLogo = (ImageView) findViewById(R.id.tttLogo);
+
+// IMPLEMENTATION OF AN ANIMATION LIBRARY, UNTESTED
+        // ViewAnimator va = new ViewAnimator();
+        // va.animate(tttLogo).alpha(0,1).duration(2000);
+
+
 
         // This is the code for the Fade In Animation that plays first.
         // Notice we start this animation right away.

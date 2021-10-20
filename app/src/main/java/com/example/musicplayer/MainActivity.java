@@ -102,11 +102,6 @@ public class MainActivity extends AppCompatActivity {
         handler.postDelayed(runnable,0);
 
 
-
-        // WARNING THIS CODE HAS NOT BEEN TESTED YET. NO USB CABLE AVAILABLE
-
-
-
         // Quickly Populates our recycler view song list... IIIIIIIF there are entries
         songArr = parser.getEntries();
         if(songArr != null) {
