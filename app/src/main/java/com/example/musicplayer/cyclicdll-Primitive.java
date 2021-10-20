@@ -1,5 +1,11 @@
 package com.example.musicplayer;
 
+/*
+Again, Alessa's Implementation of a CDLL
+(This time ya boy didn't touch anything, this is basically
+line by line what she wrote thank youuuuu).
+ */
+
 class CyclicDoubleInt{
    class IntNode {
       int data;

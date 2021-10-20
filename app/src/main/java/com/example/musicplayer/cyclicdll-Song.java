@@ -1,5 +1,8 @@
 package com.example.musicplayer;
-
+/*
+Alessa's Implementation of a CDLL (Slighly Rearranged by
+ya boy to make it work better for the song objects)
+ */
 class CyclicDouble {
    //initially head is set to null
    Node head = null;

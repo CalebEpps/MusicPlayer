@@ -198,12 +198,21 @@ public class MainActivity extends AppCompatActivity {
         ffBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                // Gotta populate our CDLL RQ, Hol' up.
                 nextSong.song.populateFastFoward(mp);
                // Log.e("CURRENT MP TIME", String.valueOf(mp.getCurrentPosition()));
                 Log.e("FF NODE TIME", String.valueOf(nextSong.song.seekToNode.data));
               //  Log.e("FFBTN", String.valueOf(mp.getDuration()));
+                // Remember fast forward is a method that does seekToNode = seekToNode.next;
                 nextSong.song.fastFoward();
+                // So this is a little weird.... Let's go piece by piece shall we? Yes.
+                // mp.seekTo goes to that time in the song.
+                // nextSong.song gets the song object that currently exists in the nextSong node.
+                // .seekToNode is our node within the song object.
+                // .data gets that number for us.
                  mp.seekTo(nextSong.song.seekToNode.data);
+                 // So these are just some logs that will let everyone know it is indeed skipping 30 secs
+                // into the future.
                 Log.e("CURRENT MP TIME", String.valueOf(mp.getCurrentPosition()));
                 toastGeneric("The Current Time of the Song is: " + String.valueOf(mp.getCurrentPosition() / 1000) + " seconds.");
             }
@@ -213,10 +222,18 @@ public class MainActivity extends AppCompatActivity {
         ffBtn.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
+                // Rip byyyyyyye nodes.
                 nextSong.song.skipTimeCDLL.deleteAllNodes();
+                // Repopulate the song's CDLL
                 nextSong.song.populateFastFoward(mp);
+                // Sett the time 30 seconds into the future
+                // (We're assuming the user wanted to fast forward on the
+                // long press.
                 nextSong.song.fastFoward();
+                // Aww yeah you know what time it is.
                 mp.seekTo(nextSong.song.seekToNode.data);
+                // So apparently you have to return a boolean with
+                // long click listeners. IDK why.
                 return true;
             }
 
@@ -258,8 +275,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 try {
+                    // This is our pause functionality here
                     if (mp.isPlaying()) {
                         mp.pause();
+                        // This variable needed to be changed here for some reason
+                        // I forgot why
                         isMPStopped = false;
                     } else {
                         if(!isMPStopped) {
@@ -305,7 +325,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-        // This will play the previous song.
+        // This will play the previous song. Who would've guessed?
         prevButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -382,6 +402,7 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == Constants.REQ_UNICORN_FILE && resultCode == RESULT_OK) {
             if (data != null) {
                 // Two important arraylists for populating our JSON file.
+                // And two we don't use at all.
                 ArrayList<String> titles = new ArrayList<>();
                 ArrayList<String> paths = new ArrayList<>();
                 ArrayList<String> artists = new ArrayList<>();
@@ -530,7 +551,8 @@ public class MainActivity extends AppCompatActivity {
                 Log.e("path", "empty");
             }
         }
-
+// I love love love this little method. It allows me to basically throw any text to the screen
+    // really fast.
         public void toastGeneric(String textToShow) {
             Toast.makeText(this, textToShow,
                     Toast.LENGTH_SHORT).show();

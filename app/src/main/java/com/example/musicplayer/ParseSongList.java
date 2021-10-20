@@ -192,11 +192,6 @@ public class ParseSongList extends AppCompatActivity {
         return counter;
     }
 
-
-        public void deleteSong(String path) {
-
-    }
-
     public Song[] getEntries()  {
         // If API version is > 30, we need to write/read to docs folder, NOT our own.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
