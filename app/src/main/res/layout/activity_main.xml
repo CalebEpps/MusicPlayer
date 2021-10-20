@@ -146,13 +146,13 @@
         android:id="@+id/rotatingAds"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:scaleType="centerCrop"
+        android:scaleType="centerInside"
         android:scaleX="1"
         android:scaleY="1"
         app:layout_constraintBottom_toTopOf="@+id/textView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:srcCompat="@mipmap/ad_banner_one_foreground" />
+        tools:srcCompat="@drawable/ad_one" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

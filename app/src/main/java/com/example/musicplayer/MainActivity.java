@@ -58,8 +58,8 @@ public class MainActivity extends AppCompatActivity {
     ImageView adBanner;
 
     // These variables are used to process and run the ad banners. :)
-    int[] adBannerPaths = {R.mipmap.ad_banner_one_foreground, R.mipmap.ad_banner_three_foreground, R.mipmap.ad_four_foreground, R.mipmap.ad_five_foreground,
-                           R.mipmap.ad_six_foreground, R.mipmap.ad_seven_foreground, R.mipmap.ad_eight_foreground, R.mipmap.ad_nine_foreground};
+    int[] adBannerPaths = {R.drawable.ad_one, R.drawable.ad_two, R.drawable.ad_three, R.drawable.ad_four,
+                           R.drawable.ad_five, R.drawable.ad_seven, R.drawable.ad_eight, R.drawable.ad_nine};
     CyclicDoubleInt adBannerCDLL = new CyclicDoubleInt();
     CyclicDoubleInt.IntNode currentAd;
     // This runnable is infinite and runs every 7 seconds to change our banner ad.
