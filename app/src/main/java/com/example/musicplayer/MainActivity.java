@@ -199,22 +199,26 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 // Gotta populate our CDLL RQ, Hol' up.
-                nextSong.song.populateFastFoward(mp);
-               // Log.e("CURRENT MP TIME", String.valueOf(mp.getCurrentPosition()));
-                Log.e("FF NODE TIME", String.valueOf(nextSong.song.seekToNode.data));
-              //  Log.e("FFBTN", String.valueOf(mp.getDuration()));
-                // Remember fast forward is a method that does seekToNode = seekToNode.next;
-                nextSong.song.fastFoward();
-                // So this is a little weird.... Let's go piece by piece shall we? Yes.
-                // mp.seekTo goes to that time in the song.
-                // nextSong.song gets the song object that currently exists in the nextSong node.
-                // .seekToNode is our node within the song object.
-                // .data gets that number for us.
-                 mp.seekTo(nextSong.song.seekToNode.data);
-                 // So these are just some logs that will let everyone know it is indeed skipping 30 secs
-                // into the future.
-                Log.e("CURRENT MP TIME", String.valueOf(mp.getCurrentPosition()));
-                toastGeneric("The Current Time of the Song is: " + String.valueOf(mp.getCurrentPosition() / 1000) + " seconds.");
+                if (nextSong != null) {
+                    nextSong.song.populateFastFoward(mp);
+                    // Log.e("CURRENT MP TIME", String.valueOf(mp.getCurrentPosition()));
+                    Log.e("FF NODE TIME", String.valueOf(nextSong.song.seekToNode.data));
+                    //  Log.e("FFBTN", String.valueOf(mp.getDuration()));
+                    // Remember fast forward is a method that does seekToNode = seekToNode.next;
+                    nextSong.song.fastFoward();
+                    // So this is a little weird.... Let's go piece by piece shall we? Yes.
+                    // mp.seekTo goes to that time in the song.
+                    // nextSong.song gets the song object that currently exists in the nextSong node.
+                    // .seekToNode is our node within the song object.
+                    // .data gets that number for us.
+                    mp.seekTo(nextSong.song.seekToNode.data);
+                    // So these are just some logs that will let everyone know it is indeed skipping 30 secs
+                    // into the future.
+                    Log.e("CURRENT MP TIME", String.valueOf(mp.getCurrentPosition()));
+                    toastGeneric("The Current Time of the Song is: " + String.valueOf(mp.getCurrentPosition() / 1000) + " seconds.");
+                } else {
+                    toastGeneric("There is no song playing right now.");
+                }
             }
         });
 // this is the loooooong click listener. press the button, it clears the fast forward CDLL and makes a new one.
@@ -223,16 +227,20 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onLongClick(View view) {
                 // Rip byyyyyyye nodes.
-                nextSong.song.skipTimeCDLL.deleteAllNodes();
-                // Repopulate the song's CDLL
-                nextSong.song.populateFastFoward(mp);
-                // Sett the time 30 seconds into the future
-                // (We're assuming the user wanted to fast forward on the
-                // long press.
-                nextSong.song.fastFoward();
-                // Aww yeah you know what time it is.
-                mp.seekTo(nextSong.song.seekToNode.data);
-                // So apparently you have to return a boolean with
+                if (nextSong != null) {
+                    nextSong.song.skipTimeCDLL.deleteAllNodes();
+                    // Repopulate the song's CDLL
+                    nextSong.song.populateFastFoward(mp);
+                    // Sett the time 30 seconds into the future
+                    // (We're assuming the user wanted to fast forward on the
+                    // long press.
+                    nextSong.song.fastFoward();
+                    // Aww yeah you know what time it is.
+                    mp.seekTo(nextSong.song.seekToNode.data);
+                    // So apparently you have to return a boolean with
+                } else {
+                    toastGeneric("There is no song playing right now.");
+                }
                 // long click listeners. IDK why.
                 return true;
             }
@@ -242,10 +250,14 @@ public class MainActivity extends AppCompatActivity {
         rewBtn.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
-                nextSong.song.skipTimeCDLL.deleteAllNodes();
-                nextSong.song.populateRewind(mp);
-                nextSong.song.rewind();
-                mp.seekTo(nextSong.song.seekToNode.data);
+                if(nextSong != null) {
+                    nextSong.song.skipTimeCDLL.deleteAllNodes();
+                    nextSong.song.populateRewind(mp);
+                    nextSong.song.rewind();
+                    mp.seekTo(nextSong.song.seekToNode.data);
+                } else {
+                    toastGeneric("There is no song playing right now.");
+                }
                 return true;
             }
 
@@ -256,14 +268,18 @@ public class MainActivity extends AppCompatActivity {
         rewBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-              //  Log.e("CURRENT MP TIME", String.valueOf(mp.getCurrentPosition()));
-                nextSong.song.populateRewind(mp);
-                Log.e("RW NODE TIME", String.valueOf(nextSong.song.seekToNode.data));
-              //  Log.e("RWBTN", String.valueOf(mp.getDuration()));
-                nextSong.song.rewind();
-                mp.seekTo(nextSong.song.seekToNode.data);
-                Log.e("CURRENT MP TIME", String.valueOf(mp.getCurrentPosition()));
-                toastGeneric("The Current Time of the Song is: " + String.valueOf(mp.getCurrentPosition() / 1000) + " seconds.");
+                if(nextSong != null) {
+                    //  Log.e("CURRENT MP TIME", String.valueOf(mp.getCurrentPosition()));
+                    nextSong.song.populateRewind(mp);
+                    Log.e("RW NODE TIME", String.valueOf(nextSong.song.seekToNode.data));
+                    //  Log.e("RWBTN", String.valueOf(mp.getDuration()));
+                    nextSong.song.rewind();
+                    mp.seekTo(nextSong.song.seekToNode.data);
+                    Log.e("CURRENT MP TIME", String.valueOf(mp.getCurrentPosition()));
+                    toastGeneric("The Current Time of the Song is: " + String.valueOf(mp.getCurrentPosition() / 1000) + " seconds.");
+                } else {
+                    toastGeneric("There is no song playing right now.");
+                }
             }
         });
 
@@ -274,29 +290,33 @@ public class MainActivity extends AppCompatActivity {
         playButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                try {
-                    // This is our pause functionality here
-                    if (mp.isPlaying()) {
-                        mp.pause();
-                        // This variable needed to be changed here for some reason
-                        // I forgot why
-                        isMPStopped = false;
-                    } else {
-                        if(!isMPStopped) {
-                         //   Log.e("MP PLAY BTN", "MP PLAY BUTTON KNEW MP WAS NOT STOPPED");
-                            mp.start();
-                        } else {
-                         //   Log.e("MP PLAY BUTTON","MP PLAY BUTTON SAYS MP WAS STOPPED");
-                            String pathToPlay = nextSong.song.getPath();
-                            mp.setDataSource(pathToPlay);
-                            mp.prepareAsync();
+                if (nextSong != null) {
+                    try {
+                        // This is our pause functionality here
+                        if (mp.isPlaying()) {
+                            mp.pause();
+                            // This variable needed to be changed here for some reason
+                            // I forgot why
                             isMPStopped = false;
+                        } else {
+                            if (!isMPStopped) {
+                                //   Log.e("MP PLAY BTN", "MP PLAY BUTTON KNEW MP WAS NOT STOPPED");
+                                mp.start();
+                            } else {
+                                //   Log.e("MP PLAY BUTTON","MP PLAY BUTTON SAYS MP WAS STOPPED");
+                                String pathToPlay = nextSong.song.getPath();
+                                mp.setDataSource(pathToPlay);
+                                mp.prepareAsync();
+                                isMPStopped = false;
+                            }
+
                         }
 
+                    } catch (Exception e) {
+
                     }
-
-                } catch (Exception e) {
-
+                } else {
+                    toastGeneric("There is no song playing right now.");
                 }
             }
         });
