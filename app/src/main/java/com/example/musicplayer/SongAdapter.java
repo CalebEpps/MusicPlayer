@@ -31,8 +31,6 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Song song = songs[position];
         holder.songTitle.setText(song.getTitle());
-        holder.genre.setText(song.getGenre());
-        holder.artist.setText(song.getArtist());
 
 
 
@@ -49,14 +47,10 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public TextView songTitle;
-        public TextView genre;
-        public TextView artist;
         public ConstraintLayout constraintLayout;
         public ViewHolder(View itemView) {
             super(itemView);
             this.songTitle = (TextView)  itemView.findViewById(R.id.songTitle);
-            this.genre = (TextView) itemView.findViewById(R.id.genre);
-            this.artist = (TextView) itemView.findViewById(R.id.artist);
             constraintLayout = (ConstraintLayout) itemView.findViewById(R.id.constraintLayout);
         }
     }

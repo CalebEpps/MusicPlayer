@@ -35,7 +35,6 @@ public class MainActivity extends AppCompatActivity {
     // Declare our Media Player Early so it can be used everywhere in this class.
     MediaPlayer mp = new MediaPlayer();
     // Boolean for mediaplayer, currently not used due to no ability to play music (Removed for testing)
-    boolean isMPPlaying = false;
     boolean isMPStopped = false;
     // This is the arraylist of files the user is trying to import. It does NOT STORE SONGS THE USER HAS ALREADY SELECTED.
     ArrayList<String> songs;
@@ -45,21 +44,38 @@ public class MainActivity extends AppCompatActivity {
     // This is our array of songs for the recyclerView
     Song[] songArr;
 
-// This is our CDLL that we use to do... Most everything. :D
+    // This is our CDLL that we use to do... Most everything. :D
     CyclicDouble CDLList = new CyclicDouble();
     Node nextSong;
     CyclicDoubleInt.IntNode tempNode;
-// Only allows the user to choose popular audio file types.
+    // Only allows the user to choose popular audio file types.
     String[] filters = {"mp3","ogg","wav","m4a"};
-// This boolean is no longer used. It WAS being used for testing purposes regarding the rw and ff functionality
+    // This boolean is no longer used. It WAS being used for testing purposes regarding the rw and ff functionality
     boolean progressEnable = true;
 
 
     // WARNING THIS CODE HAS NOT BEEN TESTED. NO USB CABLE AVAILABLE.
     Handler handler = new Handler();
     CyclicDoubleStr CDLLStr = new CyclicDoubleStr();
-    ImageView adBanner = findViewById(R.id.rotatingAds);
-    int  adBannerCounter = 0;
+    ImageView adBanner;
+
+    // These variables are used to process and run the ad banners. :)
+    int[] adBannerPaths = {R.mipmap.ad_banner_one_foreground, R.mipmap.ad_banner_three_foreground, R.mipmap.ad_four_foreground, R.mipmap.ad_five_foreground,
+                           R.mipmap.ad_six_foreground, R.mipmap.ad_seven_foreground, R.mipmap.ad_eight_foreground, R.mipmap.ad_nine_foreground};
+    CyclicDoubleInt adBannerCDLL = new CyclicDoubleInt();
+    CyclicDoubleInt.IntNode currentAd;
+    // This runnable is infinite and runs every 7 seconds to change our banner ad.
+    Runnable runnable = new Runnable() {
+        @Override
+        public void run() {
+    // Set our image to the next ad in the currentAd CDLL
+            currentAd = currentAd.next;
+            adBanner.setImageDrawable(getResources().getDrawable(currentAd.data));
+            // This works kinda like recursion, the runnable infinitely calls itself because we want the ad to infinitely cycle
+            // while the app is open :D
+            handler.postDelayed(runnable, 8000);
+        }
+    };
 
 
 
@@ -70,43 +86,22 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-// This code locks the phone in portrait mode because FUCK THE INSTANCE STATE STUFF I DON'T HAVE TIME TO IMPLEMENT IT
+        // This code locks the phone in portrait mode because FUCK THE INSTANCE STATE STUFF I DON'T HAVE TIME TO IMPLEMENT IT
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-// WARNING UNTESTEDCODE
-        int[] adBannerPaths = {R.drawable.ad_banner_one_background,R.drawable.ad_banner_two_background, R.drawable.ad_banner_three_background};
+        // Initialize our ad banner variable
+        adBanner = findViewById(R.id.rotatingAds);
 
-// WARNING THIS CODE HAS NOT BEEN TESTED YET. NO USB CABLE AVAILABLE
-
-        Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                // Insert custom code here
-                if(adBannerCounter <= 2) {
-                    adBanner.setImageDrawable(getResources().getDrawable(adBannerPaths[adBannerCounter]));
-                    adBannerCounter++;
-                    // This code is NOT WORKING, TRY CREATING THE RUNNABLE AND HANDLER IN CLASS
-                    // AND THEN MAKE THE BeloW CODE WHERE IT CHANGES THE IMAGE INTO A METHOD
-                   // handler.postDelayed(runnable, 2000);
-                } else {
-                    adBannerCounter = 0;
-                    adBanner.setImageDrawable(getResources().getDrawable(adBannerPaths[adBannerCounter]));
-                    adBannerCounter++;
-                }
-
-            }
-        };
-
-        /* REFERENCE CODE
-            final Handler handler = new Handler();
-    handler.postDelayed(new Runnable() {
-        public void run() {
-            int randomNum = random.nextInt(6);
-            dice.setImageResource(images[randomNum]);
-            handler.postDelayed(this, 500);
+        // For loop that populates our like... 22nd CDLL at this point.
+        for(int i = 0; i < adBannerPaths.length; i++) {
+            adBannerCDLL.insertNode(adBannerPaths[i]);
         }
-    }, 500);
+        currentAd = adBannerCDLL.head;
+        // This asyncronously runs our delayed code to cycle the CDLL of our ad banners.
+        handler.postDelayed(runnable,0);
 
-         */
+
+
+        // WARNING THIS CODE HAS NOT BEEN TESTED YET. NO USB CABLE AVAILABLE
 
 
 
@@ -121,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
             for (Song song : songArr) {
                 CDLList.insertNode(song);
             }
-// Is there already a song in our CDLL? Cool fuckin' play that shit.
+            // Is there already a song in our CDLL? Cool fuckin' play that shit.
             nextSong = CDLList.head;
 
             Log.e("DID POPULATE?:",CDLList.toString());
@@ -166,22 +161,25 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onCompletion(MediaPlayer mediaPlayer) {
                         mp.reset();
-
-                        if(nextSong.next != null) {
-                            nextSong = nextSong.next;
-
-                        }
-
-                        String pathToPlay =  nextSong.song.getPath();
-
                         try {
-                            mp.setDataSource(pathToPlay);
-                            mp.prepareAsync();
+                            if (nextSong.next != null) {
+                                nextSong = nextSong.next;
 
-                        } catch (IOException e) {
-                            e.printStackTrace();
+                            }
+
+                            String pathToPlay = nextSong.song.getPath();
+
+                            try {
+                                mp.setDataSource(pathToPlay);
+                                mp.prepareAsync();
+
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+
+                        } catch (Exception e) {
+
                         }
-
                     }
                 }
 
@@ -189,7 +187,8 @@ public class MainActivity extends AppCompatActivity {
 
         // Just Grabbing our buttons for java code. Don't mind it.
         Button selectButton = findViewById(R.id.fileSelectBtn);
-        ImageButton stopButton = findViewById(R.id.StopButton);
+        // STOP BUTTON IS INACTIVE. CAN BE ADDED BACK BY UNCOMMENTING RELEVANT CODE
+       // ImageButton stopButton = findViewById(R.id.StopButton);
         ImageButton playButton = findViewById(R.id.playButton);
         ImageButton skipButton = findViewById(R.id.NextBtn);
         ImageButton prevButton = findViewById(R.id.previousBtn);
@@ -334,24 +333,24 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
+// OLD STOP BUTTON CODE. UNCOMMENT AND ADD START BUTTON INITIALIZER ABOVE TO REMAKE
         // Currently unused method for stop button. Ability to Play Sound Removed.
-        stopButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                try {
-                    if (mp.isPlaying()) {
-                        mp.reset();
-                        isMPStopped = true;
-                        nextSong = CDLList.head;
-                    } else {
-                    }
+    //    stopButton.setOnClickListener(new View.OnClickListener() {
+      //      @Override
+      //      public void onClick(View view) {
+         //       try {
+           //         if (mp.isPlaying()) {
+          ////              mp.reset();
+            //            isMPStopped = true;
+            //            nextSong = CDLList.head;
+             //       } else {
+            //        }
 
-                } catch (Exception e) {
+            //    } catch (Exception e) {
                     //      toastNothingPlaying("There is nothing playing, try selecting a file!");
-                }
-            }
-        });
+          //      }
+       //     }
+     //   });
 
 
         // Sets our button listener
@@ -411,7 +410,6 @@ public class MainActivity extends AppCompatActivity {
                     Log.e("FILE NAME: ", songName);
 
 
-
                     // Unused Incremented Variable
                     counter++;
                 }
@@ -425,14 +423,14 @@ public class MainActivity extends AppCompatActivity {
                 File directoryToCreate;
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                     directoryToCreate = new File(Environment.getExternalStorageDirectory(), sdkOver29);
+                    directoryToCreate = new File(Environment.getExternalStorageDirectory(), sdkOver29);
                 } else {
-                     directoryToCreate = new File(Environment.getExternalStorageDirectory(), sdkunder29);
+                    directoryToCreate = new File(Environment.getExternalStorageDirectory(), sdkunder29);
                 }
 
 
                 // Does the directory exist? If so, we will populate the existing file.
-                Log.e("DIRECTORY: ",directoryToCreate.getPath());
+                Log.e("DIRECTORY: ", directoryToCreate.getPath());
                 if (directoryToCreate.exists()) {
                     // Populates an existing Directory if it's necessary.
                     Log.e("DIRECTORY EXISTS?: ", "True");
@@ -454,13 +452,13 @@ public class MainActivity extends AppCompatActivity {
 
                     // Ensure that we add our newly selected songs to our CDLL.
                     // This code should also skip duplicates.
-                    for(int i = 0; i < paths.size(); i++) {
-                        for(int j = 0; j < getAllSongsBefore.length;j++ ){
+                    for (int i = 0; i < paths.size(); i++) {
+                        for (int j = 0; j < getAllSongsBefore.length; j++) {
                             // This inner loop checks our previous json file against the
                             // songs that were just selected and changes our boolean for us.
-                            if(getAllSongsBefore[j].getPath().equals(paths.get(i))) {
+                            if (getAllSongsBefore[j].getPath().equals(paths.get(i))) {
                                 alreadyExists = true;
-                                Log.e("INNER LOOP: " ,"SONG ALREADY EXISTS");
+                                Log.e("INNER LOOP: ", "SONG ALREADY EXISTS");
                             } else {
                                 Log.e("INNER LOOP:", "SONG DOES NOT EXIST");
                             }
@@ -468,11 +466,11 @@ public class MainActivity extends AppCompatActivity {
                         }
                         // If that song already exists in our file, we don't add it.
                         // Otherwise, we add it to our CDLL.
-                        if(!alreadyExists) {
+                        if (!alreadyExists) {
                             Log.e("ALREADY EXISTS?: ", "FALSE");
-                            CDLList.insertNode(new Song(titles.get(i),paths.get(i)));
+                            CDLList.insertNode(new Song(titles.get(i), paths.get(i)));
                         }
-                    // Here we need to reset the boolean variable after the inner loop
+                        // Here we need to reset the boolean variable after the inner loop
                         // has run so we can check the next song.
                         alreadyExists = false;
 
@@ -497,7 +495,7 @@ public class MainActivity extends AppCompatActivity {
 
                         // This will populate and initialize our recycleview our FIRST ENTRIES once they've been added.
                         songArr = parser.getEntries();
-                        if(songArr != null) {
+                        if (songArr != null) {
                             RecyclerView recyclerView = (RecyclerView) findViewById(R.id.songList);
                             SongAdapter adapter = new SongAdapter(songArr);
                             recyclerView.setHasFixedSize(false);
@@ -511,21 +509,22 @@ public class MainActivity extends AppCompatActivity {
                         Log.e("ERROR IN IO", "IO ERROR IN POPULATE FIRST TIME");
                         Log.e(TAG, e.getMessage());
                     }
+                    if (paths != null) {
+                        // This is our for loop to add the new songs to our CDLL.
+                        for (int i = 0; i < paths.size(); i++) {
+                            CDLList.insertNode(new Song(titles.get(i), paths.get(i)));
+                            Log.e("CDLL POPULATED:", CDLList.head.song.getTitle());
+                        }
+                        nextSong = CDLList.head;
+                        String pathToPlay = nextSong.song.getPath();
+                        try {
+                            mp.setDataSource(pathToPlay);
+                            mp.prepareAsync();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
 
-                // This is our for loop to add the new songs to our CDLL.
-                for(int i = 0; i < paths.size(); i++) {
-                    CDLList.insertNode(new Song(titles.get(i), paths.get(i)));
-                    Log.e("CDLL POPULATED:",CDLList.head.song.getTitle());
-                }
-                nextSong = CDLList.head;
-                String pathToPlay =  nextSong.song.getPath();
-                    try {
-                        mp.setDataSource(pathToPlay);
-                        mp.prepareAsync();
-                    } catch (IOException e) {
-                        e.printStackTrace();
                     }
-
                 }
             }
 
