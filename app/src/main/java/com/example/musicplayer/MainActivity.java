@@ -21,6 +21,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -45,6 +46,8 @@ public class MainActivity extends AppCompatActivity {
 
     // Declare our Media Player Early so it can be used everywhere in this class.
     MediaPlayer mp = new MediaPlayer();
+
+    Toast toast;
 
     // Boolean for mediaplayer, currently not used due to no ability to play music (Removed for testing)
     boolean isMPStopped = false;
@@ -97,6 +100,9 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+// This string is important for setting up our title to display. :D
+    String currentlyPlaying;
+
 
 
 
@@ -107,6 +113,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // these are super important, I added it super late which is why it's
+        // at the top lol
+        TextView songTitle = findViewById(R.id.songTitle);
+        TextView currentlyPlayingText = findViewById(R.id.textView2);
 
         // This code locks the phone in portrait mode because FUCK THE INSTANCE STATE STUFF I DON'T HAVE TIME TO IMPLEMENT IT
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -169,6 +180,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onPrepared(MediaPlayer mp) {
                 // Okay so this will start our audio ONCE IT'S READY
+                currentlyPlaying = nextSong.song.getTitle();
+                songTitle.setText(currentlyPlaying);
+                currentlyPlayingText.setText("Currently Playing:");
                 toastGeneric("The Total Time for this Track is: " + mp.getDuration() / 1000 + " Seconds.");
                 mp.start();
               //  isMPPlaying = true;
@@ -361,6 +375,7 @@ public class MainActivity extends AppCompatActivity {
                         // so we need to make sure that the next node exists. :)
                         if(nextSong.next != null) {
                             nextSong = nextSong.next;
+
                         }
                         String pathToPlay = nextSong.song.getPath();
                         mp.setDataSource(pathToPlay);
@@ -604,8 +619,18 @@ public class MainActivity extends AppCompatActivity {
 // I love love love this little method. It allows me to basically throw any text to the screen
     // really fast.
         public void toastGeneric(String textToShow) {
-            Toast.makeText(this, textToShow,
-                    Toast.LENGTH_SHORT).show();
+        // IF a toast is on the screen, it won't throw an error lmao
+        try{ toast.getView().isShown();
+            // Sets the text of our currently shown toast.
+                toast.setText(textToShow);
+                // This is a doozy. If the above method throws an excpetion,
+            // Then we will actually create the toast. THEN if we press the button again,
+            // there won't be an exception until the toast disappears.
+            } catch (Exception e) {
+                toast = Toast.makeText(this, textToShow, Toast.LENGTH_SHORT);
+            }
+        // Gotta show that toast.
+            toast.show();
         }
 // This is the permission checker. It opens a popup that will ask the user for access to write to their storage.
        // The request code is declared at the top of our class. It can be any number :D
