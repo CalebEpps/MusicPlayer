@@ -3,4 +3,6 @@
     <string name="second_main_name">Where Every Song is a Circle</string>
     <string name="select_file_button">Select Songs</string>
     <string name="version">Version: 0.1.0</string>
+    <string name="inputTime">Split the Song by:</string>
+    <string name="intputTimeEnd"> Seconds (Up to 30).</string>
 </resources>

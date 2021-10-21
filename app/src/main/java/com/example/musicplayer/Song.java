@@ -72,7 +72,7 @@ public class Song {
         if(skipTimeCDLL.head == null) {
         FormulaDivide fd = new FormulaDivide();
         currentTime = mp.getCurrentPosition();
-        ArrayList<Integer> tempList = fd.FFFormula(mp.getDuration(),currentTime);
+        ArrayList<Integer> tempList = fd.FFFormula(mp.getDuration(),currentTime, 15000);
         for(int i = 0; i < tempList.size(); i++) {
            skipTimeCDLL.insertNode(tempList.get(i));
             }
@@ -90,7 +90,7 @@ public class Song {
             currentTime = mp.getCurrentPosition();
             // Create an arraylist that makes use of our mathy goodness to divide
             // the songs into 30 second intervals.
-            ArrayList<Integer> tempList = fd.RRformula(mp.getDuration(),currentTime);
+            ArrayList<Integer> tempList = fd.RRformula(mp.getDuration(),currentTime, 15000);
             // This for loop populates our CDLL with the results from the above.
             for(int i = 0; i < tempList.size(); i++) {
                skipTimeCDLL.insertNode(tempList.get(i));

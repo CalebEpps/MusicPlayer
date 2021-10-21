@@ -13,9 +13,12 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -40,30 +43,40 @@ public class MainActivity extends AppCompatActivity {
     // Permission Check Variable
     private static final int STORAGE_PERMISSION_CODE = 101;
 
-
     // Declare our Media Player Early so it can be used everywhere in this class.
     MediaPlayer mp = new MediaPlayer();
+
     // Boolean for mediaplayer, currently not used due to no ability to play music (Removed for testing)
     boolean isMPStopped = false;
+
     // This is the arraylist of files the user is trying to import. It does NOT STORE SONGS THE USER HAS ALREADY SELECTED.
     ArrayList<String> songs;
 
     // The creates our parser so we can use it in the below if/else statements.
+
     ParseSongList parser = new ParseSongList();
+
     // This is our array of songs for the recyclerView
     Song[] songArr;
 
     // This is our CDLL that we use to do... Most everything. :D
+    // (Props to Alessa for making a great CDLL class)
     CyclicDouble CDLList = new CyclicDouble();
     Node nextSong;
     CyclicDoubleInt.IntNode tempNode;
+
     // Only allows the user to choose popular audio file types.
     String[] filters = {"mp3","ogg","wav","m4a"};
+
     // This boolean is no longer used. It WAS being used for testing purposes regarding the rw and ff functionality
     boolean progressEnable = true;
 
+    String temp = null;
 
+    // Here we declare our handler. It allows us to run things asyncronously on the same
+    // or different threads.
     Handler handler = new Handler();
+    // This is the image view of our banner. We'll initialize it a bit later.
     ImageView adBanner;
 
     // These variables are used to process and run the ad banners. :)
@@ -71,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
                            R.drawable.ad_five, R.drawable.ad_seven, R.drawable.ad_eight, R.drawable.ad_nine};
     CyclicDoubleInt adBannerCDLL = new CyclicDoubleInt();
     CyclicDoubleInt.IntNode currentAd;
-    // This runnable is infinite and runs every 7 seconds to change our banner ad.
+    // This runnable is infinite and runs every few seconds to change our banner ad.
     Runnable runnable = new Runnable() {
         @Override
         public void run() {
@@ -88,7 +101,8 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-    // onCreate Method for doing... Everything?
+    // onCreate Method for doing... Everything? That needs to be done at startup.
+    // Dr. Dasgupta, can I have an entire class period to go over this method plz?
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -112,7 +126,6 @@ public class MainActivity extends AppCompatActivity {
         // This asyncronously runs our delayed code to cycle the CDLL of our ad banners.
         handler.postDelayed(runnable,0);
 
-
         // Quickly Populates our recycler view song list... IIIIIIIF there are entries
         songArr = parser.getEntries();
         if(songArr != null) {
@@ -125,13 +138,16 @@ public class MainActivity extends AppCompatActivity {
                 CDLList.insertNode(song);
             }
             // Is there already a song in our CDLL? Cool fuckin' play that shit.
+            // Remember this is only called if the song array isn't empty
+            // which in turn means our CDLList isn't empty either.
             nextSong = CDLList.head;
-
+            // Just a testing Log.
             Log.e("DID POPULATE?:",CDLList.toString());
 
             recyclerView.setAdapter(adapter);
         } else {
-            // RIP There aren't any songs which means this is a first time load.
+            // RIP There aren't any songs which means this is a first time load,
+            // or we got BIT issues.
             // Nothing will happen here leaving our CDLL null;
 
         }
@@ -202,6 +218,8 @@ public class MainActivity extends AppCompatActivity {
         ImageButton prevButton = findViewById(R.id.previousBtn);
         ImageButton ffBtn = findViewById(R.id.FFBtn);
         ImageButton rewBtn = findViewById(R.id.rewBtn);
+
+
 
 // Fast forward button... Fast forwards. BUT IT ALSO USES A CDLL TO DO SO, COOL STUFF HUH?
         // ONLY TOOK LIKE 12 HOURS OF BLOOD, TEARS, AND HIGH CHOLESTEROL TO GET IT TO WORK.
@@ -382,6 +400,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
 // OLD STOP BUTTON CODE. UNCOMMENT AND ADD START BUTTON INITIALIZER ABOVE TO REMAKE
+        // The stop button did not fit properly on the screen.
         // Currently unused method for stop button. Ability to Play Sound Removed.
     //    stopButton.setOnClickListener(new View.OnClickListener() {
       //      @Override
@@ -589,6 +608,9 @@ public class MainActivity extends AppCompatActivity {
                     Toast.LENGTH_SHORT).show();
         }
 // This is the permission checker. It opens a popup that will ask the user for access to write to their storage.
+       // The request code is declared at the top of our class. It can be any number :D
+    // If the permissions aren't granted, the program will return a different number, I think
+    // it's like -1 or something.
         public void permissionCheck(String permissionType, int reqCode) {
             if(ContextCompat.checkSelfPermission(MainActivity.this, permissionType) == PackageManager.PERMISSION_DENIED) {
                 ActivityCompat.requestPermissions(MainActivity.this, new String[] {permissionType }, reqCode);
