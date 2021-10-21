@@ -4,7 +4,9 @@
     package="com.example.musicplayer">
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
+
     <uses-feature android:name="android.hardware.screen.portrait" />
 
     <application
@@ -13,17 +15,17 @@
         android:label="@string/main_name"
         android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/app_icon_round"
+        android:screenOrientation="portrait"
         android:supportsRtl="true"
-        android:theme="@style/Theme.MusicPlayer"
-        android:screenOrientation="portrait">
+        android:theme="@style/Theme.MusicPlayer">
         <activity
             android:name=".ViewSongAcitivty"
             android:exported="true"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".SplashScreen"
             android:exported="true">
@@ -34,4 +36,5 @@
             </intent-filter>
         </activity>
     </application>
+
 </manifest>

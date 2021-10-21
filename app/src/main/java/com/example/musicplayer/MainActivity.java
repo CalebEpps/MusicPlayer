@@ -2,8 +2,11 @@ package com.example.musicplayer;
 
 import static android.content.ContentValues.TAG;
 
+import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.os.Build;
@@ -17,8 +20,11 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -30,6 +36,9 @@ import abhishekti7.unicorn.filepicker.UnicornFilePicker;
 import abhishekti7.unicorn.filepicker.utils.Constants;
 
 public class MainActivity extends AppCompatActivity {
+
+    // Permission Check Variable
+    private static final int STORAGE_PERMISSION_CODE = 101;
 
 
     // Declare our Media Player Early so it can be used everywhere in this class.
@@ -87,6 +96,8 @@ public class MainActivity extends AppCompatActivity {
 
         // This code locks the phone in portrait mode because FUCK THE INSTANCE STATE STUFF I DON'T HAVE TIME TO IMPLEMENT IT
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        // This is the VERY first thing that runs and it makes sure that we have the permission to access the user's files for reading and writing songs. :)
+        permissionCheck(Manifest.permission.WRITE_EXTERNAL_STORAGE, STORAGE_PERMISSION_CODE);
 
         // Initialize our ad banner variable
         adBanner = findViewById(R.id.rotatingAds);
@@ -577,8 +588,26 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this, textToShow,
                     Toast.LENGTH_SHORT).show();
         }
-
-
+// This is the permission checker. It opens a popup that will ask the user for access to write to their storage.
+        public void permissionCheck(String permissionType, int reqCode) {
+            if(ContextCompat.checkSelfPermission(MainActivity.this, permissionType) == PackageManager.PERMISSION_DENIED) {
+                ActivityCompat.requestPermissions(MainActivity.this, new String[] {permissionType }, reqCode);
+            } else {
+               // toastGeneric("You're all set with your permission, thank you for trusting Circle Player");
+            }
+        }
+// This method is like a return statement for our permission checker method. It let's the user know that we really need access.
+    @Override
+    public void onRequestPermissionsResult(int reqCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(reqCode, permissions, grantResults);
+        if (reqCode == STORAGE_PERMISSION_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                toastGeneric("You granted storage permission, thank you! <3");
+            } else {
+                toastGeneric("Why don't you trust us, this is a school project. :(");
+            }
+        }
+    }
 
 }
 
