@@ -1,5 +1,7 @@
 package com.example.musicplayer;
 
+import static android.os.Build.VERSION.SDK_INT;
+
 import android.os.Build;
 import android.os.Environment;
 import android.util.Log;
@@ -50,7 +52,7 @@ public class ParseSongList extends AppCompatActivity {
 
         }
         // If API version is > 30, we need to write to docs folder, NOT our own.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        if (SDK_INT >= Build.VERSION_CODES.Q) {
             filePathEnd = "/Documents";
         } else {
             filePathEnd = "/WGACA";
@@ -58,7 +60,7 @@ public class ParseSongList extends AppCompatActivity {
         }
         // IF API version is higher than 30, we need to NOT create our folder. If it is lower than 30,
         // we can create one.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        if (SDK_INT >= Build.VERSION_CODES.Q) {
             File directoryToCreate = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).getPath());
             //directoryToCreate.mkdirs();
             // Initialize our JSON file and output stream. This will allow us to write to our file.
@@ -91,7 +93,7 @@ public class ParseSongList extends AppCompatActivity {
         Song[] existingSongs = getEntries();
 
         // If API version is > 30, we need to write/read to docs folder, NOT our own.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        if (SDK_INT >= Build.VERSION_CODES.R) {
             filePathEnd = "Documents";
         } else {
             filePathEnd = "WGACA";
@@ -166,7 +168,7 @@ public class ParseSongList extends AppCompatActivity {
      //   Log.e("RUNNING GETLENGTH", "RUNNING...");
 
         // If API version is > 30, we need to write/read to docs folder, NOT our own.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        if (SDK_INT >= Build.VERSION_CODES.R) {
             filePathEnd = "Documents";
         } else {
             filePathEnd = "WGACA";
@@ -194,7 +196,7 @@ public class ParseSongList extends AppCompatActivity {
 
     public Song[] getEntries()  {
         // If API version is > 30, we need to write/read to docs folder, NOT our own.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        if (SDK_INT >= Build.VERSION_CODES.R) {
             filePathEnd = "Documents";
         } else {
             filePathEnd = "WGACA";
@@ -228,6 +230,33 @@ public class ParseSongList extends AppCompatActivity {
          //   Log.e("RETURNED SONGS:", songs[0].toString());
             return songs;
 
+    }
+
+    public void deleteAll() {
+
+        if (SDK_INT >= Build.VERSION_CODES.Q) {
+            filePathEnd = "Documents";
+        } else {
+            filePathEnd = "WGACA";
+        }
+
+        File initJSONFile;
+        File directoryToCreate;
+        if (SDK_INT >= Build.VERSION_CODES.Q) {
+            directoryToCreate = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).getPath());
+            initJSONFile = new File(directoryToCreate.getPath() + "/songs.json");
+        } else {
+            directoryToCreate = new File(Environment.getExternalStorageDirectory(), "/WGACA");
+            initJSONFile = new File(Environment.getExternalStorageDirectory(), filePathEnd + "/songs.json");
+        }
+
+        if(initJSONFile.exists()) {
+            initJSONFile.delete();
+            if(SDK_INT >= Build.VERSION_CODES.Q) {
+                directoryToCreate.delete();
+            }
+
+        }
     }
 
 }

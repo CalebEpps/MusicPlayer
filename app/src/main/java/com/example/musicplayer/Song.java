@@ -1,6 +1,7 @@
 package com.example.musicplayer;
 
 import android.media.MediaPlayer;
+import android.provider.MediaStore;
 
 import java.util.ArrayList;
 
@@ -12,6 +13,8 @@ public class Song {
     protected int currentTime = 0;
     protected CyclicDoubleInt.IntNode seekToNode;
     protected CyclicDoubleInt skipTimeCDLL = new CyclicDoubleInt();
+    boolean checkFF = false;
+    boolean checkRW = false;
 
 // LITERALLY GENERATED THE GETTERS AND SETTERS  NOT SURE WHY IT PUT THESE TWO UP HERE :D
     public String getArtist() {
@@ -101,8 +104,8 @@ public class Song {
     // Using a separate method to set the seekToNode is more efficient
     // because if we did it in the above method, we'd need to check the condition first.
     // Calling these two below methods separately allows us more flexibility in our other files.
-    public void fastFoward() {
-        seekToNode = seekToNode.next;
+    public void fastFoward(MediaPlayer mp) {
+                seekToNode = seekToNode.next;
     }
 
     public void rewind() {

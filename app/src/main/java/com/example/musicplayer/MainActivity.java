@@ -3,24 +3,23 @@ package com.example.musicplayer;
 import static android.content.ContentValues.TAG;
 
 import android.Manifest;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
-import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,6 +34,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import abhishekti7.unicorn.filepicker.UnicornFilePicker;
 import abhishekti7.unicorn.filepicker.utils.Constants;
@@ -71,16 +71,13 @@ public class MainActivity extends AppCompatActivity {
     // Only allows the user to choose popular audio file types.
     String[] filters = {"mp3","ogg","wav","m4a"};
 
-    // This boolean is no longer used. It WAS being used for testing purposes regarding the rw and ff functionality
-    boolean progressEnable = true;
-
-    String temp = null;
-
     // Here we declare our handler. It allows us to run things asyncronously on the same
     // or different threads.
     Handler handler = new Handler();
     // This is the image view of our banner. We'll initialize it a bit later.
     ImageView adBanner;
+    TextView currentTimePlaying;
+    SeekBar seekBar;
 
     // These variables are used to process and run the ad banners. :)
     int[] adBannerPaths = {R.drawable.ad_one, R.drawable.ad_two, R.drawable.ad_three, R.drawable.ad_four,
@@ -88,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
     CyclicDoubleInt adBannerCDLL = new CyclicDoubleInt();
     CyclicDoubleInt.IntNode currentAd;
     // This runnable is infinite and runs every few seconds to change our banner ad.
-    Runnable runnable = new Runnable() {
+    Runnable adRunnable = new Runnable() {
         @Override
         public void run() {
     // Set our image to the next ad in the currentAd CDLL
@@ -96,16 +93,36 @@ public class MainActivity extends AppCompatActivity {
             adBanner.setImageDrawable(getResources().getDrawable(currentAd.data));
             // This works kinda like recursion, the runnable infinitely calls itself because we want the ad to infinitely cycle
             // while the app is open :D
-            handler.postDelayed(runnable, 8000);
+            handler.postDelayed(adRunnable, 8000);
+        }
+    };
+// BRUUH I DID IT.
+    // Okay so this is a time Runnable. It asyncrounously loads the time for the mediaplyer every second and displays it on the screen in a textview, no toast needed!
+    Runnable timeRunnable = new Runnable() {
+        @Override
+        public void run() {
+            int timeInSong = mp.getCurrentPosition();
+            currentTimePlaying.setText((String.format("%02d", timeInSong / 3600000)) + ":" + String.format("%02d",(timeInSong / 1000 / 60)) + ":" + String.format("%02d", (timeInSong / 1000) % 60));
+            handler.postDelayed(timeRunnable, 1000);
+
+        }
+    };
+// This seekbar runnable updates the seek bar every second :D
+    Runnable seekBarRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if(mp != null) {
+                int currentPlace = mp.getCurrentPosition() / 1000;
+                seekBar.setProgress(currentPlace);
+            }
+            handler.postDelayed(seekBarRunnable, 1000);
         }
     };
 
+
+
 // This string is important for setting up our title to display. :D
     String currentlyPlaying;
-
-
-
-
 
     // onCreate Method for doing... Everything? That needs to be done at startup.
     // Dr. Dasgupta, can I have an entire class period to go over this method plz?
@@ -124,8 +141,22 @@ public class MainActivity extends AppCompatActivity {
         // This is the VERY first thing that runs and it makes sure that we have the permission to access the user's files for reading and writing songs. :)
         permissionCheck(Manifest.permission.WRITE_EXTERNAL_STORAGE, STORAGE_PERMISSION_CODE);
 
+        // Just Grabbing our buttons for java code. Don't mind it.
+        Button selectButton = findViewById(R.id.fileSelectBtn);
+        // STOP BUTTON IS INACTIVE. CAN BE ADDED BACK BY UNCOMMENTING RELEVANT CODE
+        // ImageButton stopButton = findViewById(R.id.StopButton);
+        ImageButton playButton = findViewById(R.id.playButton);
+        ImageButton skipButton = findViewById(R.id.NextBtn);
+        ImageButton prevButton = findViewById(R.id.previousBtn);
+        ImageButton ffBtn = findViewById(R.id.FFBtn);
+        ImageButton rewBtn = findViewById(R.id.rewBtn);
+
         // Initialize our ad banner variable
         adBanner = findViewById(R.id.rotatingAds);
+        // This is the song timer.
+        currentTimePlaying = findViewById(R.id.songTime);
+        // this is the seekbar variable :D
+        seekBar = findViewById(R.id.seekBar);
 
         // For loop that populates our like... 22nd CDLL at this point.
         // REMEMBER: R.id.* are all integers. We re-use our Int CDLL.
@@ -135,7 +166,10 @@ public class MainActivity extends AppCompatActivity {
         // Set the first ad to the head of our CDLL.
         currentAd = adBannerCDLL.head;
         // This asyncronously runs our delayed code to cycle the CDLL of our ad banners.
-        handler.postDelayed(runnable,0);
+        handler.postDelayed(adRunnable,0);
+        // Gotta start ALL THE HANDLER RUNNABLES LET'S GOOOOO
+        handler.postDelayed(seekBarRunnable,0);
+
 
         // Quickly Populates our recycler view song list... IIIIIIIF there are entries
         songArr = parser.getEntries();
@@ -144,6 +178,7 @@ public class MainActivity extends AppCompatActivity {
             SongAdapter adapter = new SongAdapter(songArr);
             recyclerView.setHasFixedSize(false);
             recyclerView.setLayoutManager(new LinearLayoutManager(this));
+            handler.postDelayed(timeRunnable,0);
             // Populates our CDLL With songs at startup.
             for (Song song : songArr) {
                 CDLList.insertNode(song);
@@ -180,17 +215,16 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onPrepared(MediaPlayer mp) {
                 // Okay so this will start our audio ONCE IT'S READY
+                playButton.setImageDrawable(getResources().getDrawable(R.drawable.pause_btn));
                 currentlyPlaying = nextSong.song.getTitle();
                 songTitle.setText(currentlyPlaying);
                 currentlyPlayingText.setText("Currently Playing:");
-                toastGeneric("The Total Time for this Track is: " + mp.getDuration() / 1000 + " Seconds.");
+                seekBar.setMax(mp.getDuration() / 1000);
+             //   toastGeneric("The Total Time for this Track is: " + mp.getDuration() / 1000 + " Seconds.");
                 mp.start();
               //  isMPPlaying = true;
             }
         });
-
-
-
 
 
         // What happens when the song is done.
@@ -204,8 +238,8 @@ public class MainActivity extends AppCompatActivity {
                                 nextSong = nextSong.next;
 
                             }
-
                             String pathToPlay = nextSong.song.getPath();
+
 
                             try {
                                 mp.setDataSource(pathToPlay);
@@ -222,16 +256,28 @@ public class MainActivity extends AppCompatActivity {
                 }
 
         );
+// This is what happens when our seek bar is touched :O CRAZY SHIT DUDE I SWEAR TO GOD
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 
-        // Just Grabbing our buttons for java code. Don't mind it.
-        Button selectButton = findViewById(R.id.fileSelectBtn);
-        // STOP BUTTON IS INACTIVE. CAN BE ADDED BACK BY UNCOMMENTING RELEVANT CODE
-       // ImageButton stopButton = findViewById(R.id.StopButton);
-        ImageButton playButton = findViewById(R.id.playButton);
-        ImageButton skipButton = findViewById(R.id.NextBtn);
-        ImageButton prevButton = findViewById(R.id.previousBtn);
-        ImageButton ffBtn = findViewById(R.id.FFBtn);
-        ImageButton rewBtn = findViewById(R.id.rewBtn);
+
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+
+            }
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+// WHERE THE TRAP MUSIC AT THO
+            // I WANT A COKE
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                if(mp != null) {
+                    mp.seekTo(seekBar.getProgress() * 1000);
+                }
+            }
+        });
+
 
 
 
@@ -248,7 +294,7 @@ public class MainActivity extends AppCompatActivity {
                     Log.e("FF NODE TIME", String.valueOf(nextSong.song.seekToNode.data));
                     //  Log.e("FFBTN", String.valueOf(mp.getDuration()));
                     // Remember fast forward is a method that does seekToNode = seekToNode.next;
-                    nextSong.song.fastFoward();
+                    nextSong.song.fastFoward(mp);
                     // So this is a little weird.... Let's go piece by piece shall we? Yes.
                     // mp.seekTo goes to that time in the song.
                     // nextSong.song gets the song object that currently exists in the nextSong node.
@@ -258,7 +304,7 @@ public class MainActivity extends AppCompatActivity {
                     // So these are just some logs that will let everyone know it is indeed skipping 30 secs
                     // into the future.
                     Log.e("CURRENT MP TIME", String.valueOf(mp.getCurrentPosition()));
-                    toastGeneric("The Current Time of the Song is: " + String.valueOf(mp.getCurrentPosition() / 1000) + " seconds.");
+                //    toastGeneric("The Current Time of the Song is: " + String.valueOf(mp.getCurrentPosition() / 1000) + " seconds.");
                 } else {
                     toastGeneric("There is no song playing right now.");
                 }
@@ -277,7 +323,7 @@ public class MainActivity extends AppCompatActivity {
                     // Sett the time 30 seconds into the future
                     // (We're assuming the user wanted to fast forward on the
                     // long press.
-                    nextSong.song.fastFoward();
+                    nextSong.song.fastFoward(mp);
                     // Aww yeah you know what time it is.
                     mp.seekTo(nextSong.song.seekToNode.data);
                     // So apparently you have to return a boolean with
@@ -319,7 +365,7 @@ public class MainActivity extends AppCompatActivity {
                     nextSong.song.rewind();
                     mp.seekTo(nextSong.song.seekToNode.data);
                     Log.e("CURRENT MP TIME", String.valueOf(mp.getCurrentPosition()));
-                    toastGeneric("The Current Time of the Song is: " + String.valueOf(mp.getCurrentPosition() / 1000) + " seconds.");
+                  //  toastGeneric("The Current Time of the Song is: " + String.valueOf((mp.getCurrentPosition() / 1000)) + " seconds.");
                 } else {
                     toastGeneric("There is no song playing right now.");
                 }
@@ -337,6 +383,7 @@ public class MainActivity extends AppCompatActivity {
                     try {
                         // This is our pause functionality here
                         if (mp.isPlaying()) {
+                            playButton.setImageDrawable(getDrawable(R.drawable.play_btn));
                             mp.pause();
                             // This variable needed to be changed here for some reason
                             // I forgot why
@@ -344,6 +391,7 @@ public class MainActivity extends AppCompatActivity {
                         } else {
                             if (!isMPStopped) {
                                 //   Log.e("MP PLAY BTN", "MP PLAY BUTTON KNEW MP WAS NOT STOPPED");
+                                playButton.setImageDrawable(getDrawable(R.drawable.pause_btn));
                                 mp.start();
                             } else {
                                 //   Log.e("MP PLAY BUTTON","MP PLAY BUTTON SAYS MP WAS STOPPED");
@@ -567,6 +615,9 @@ public class MainActivity extends AppCompatActivity {
                     RecyclerView recyclerView = (RecyclerView) findViewById(R.id.songList);
                     SongAdapter adapter = new SongAdapter(getAllSongsAfter);
                     recyclerView.setAdapter(adapter);
+                    handler.removeCallbacks(timeRunnable);
+                    handler.postDelayed(timeRunnable,0);
+
 
                     // Log.e("POPULATELISTERROR: ", "FOLDER ALREADY EXISTS.");
                 } else {
@@ -603,6 +654,7 @@ public class MainActivity extends AppCompatActivity {
                         try {
                             mp.setDataSource(pathToPlay);
                             mp.prepareAsync();
+                            handler.postDelayed(timeRunnable,0);
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
