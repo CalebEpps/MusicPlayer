@@ -26,9 +26,11 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
 
     protected Song[] songs;
 
+
     public SongAdapter(Song[] songs) {
         this.songs = songs;
     }
+
 
     @NonNull
     @Override

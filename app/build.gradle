@@ -39,6 +39,9 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.8.8'
     implementation 'com.googlecode.json-simple:json-simple:1.1.1'
     implementation 'com.github.florent37:viewanimator:1.1.0'
+    // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
+    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.0'
+
 }
 configurations.all {
     resolutionStrategy.dependencySubstitution {

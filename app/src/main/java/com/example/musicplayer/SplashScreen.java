@@ -15,8 +15,6 @@ import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.github.florent37.viewanimator.ViewAnimator;
-
 
 public class SplashScreen extends AppCompatActivity {
 

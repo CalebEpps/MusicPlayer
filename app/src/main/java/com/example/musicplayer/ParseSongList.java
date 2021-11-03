@@ -8,6 +8,7 @@ import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -22,8 +23,12 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 
 public class ParseSongList extends AppCompatActivity {
 
@@ -258,6 +263,68 @@ public class ParseSongList extends AppCompatActivity {
 
         }
     }
+// Search method for returning an arraylist of songs that contain
+    // the search string
+    public ArrayList<Song> search(String searchStr) {
+        Song[] allSongs = getEntries();
+        if(allSongs != null) {
+            ArrayList<Song> queriedSongs = new ArrayList<>();
+
+            for (int i = 0; i < allSongs.length; i++) {
+                if (allSongs[i].getTitle().contains(searchStr) ||
+                        allSongs[i].getArtist().contains(searchStr) ||
+                        allSongs[i].getGenre().contains(searchStr)) {
+                    queriedSongs.add(allSongs[i]);
+                }
+            }
+            // Return the songs containing the key words
+            return queriedSongs;
+            // Else statement to return null if needed
+        } else {
+            return null;
+        }
+    }
+    // Method deletes a single song.
+    public void deleteSong(String songTitle) {
+
+        Song[] allSongs = getEntries();
+        boolean foundSong = false;
+
+        if(allSongs != null) {
+        for(int i = 0; i < allSongs.length; i++) {
+            if (allSongs[i].getTitle().equals(songTitle)) {
+                ArrayUtils.remove(allSongs, i);
+                foundSong = true;
+                break;
+            }
+        }
+
+        }
+
+        if(foundSong) {
+            ArrayList<Song> tempSongList = new ArrayList<>(Arrays.asList(allSongs));
+            ArrayList<String> tempTitles = new ArrayList<>();
+            ArrayList<String> tempPaths = new ArrayList<>();
+            ArrayList<String> tempGenres = new ArrayList<>();
+            ArrayList<String> tempArtists = new ArrayList<>();
+
+            for (int i = 0; i < tempSongList.size(); i++) {
+                tempTitles.add(tempSongList.get(i).getTitle());
+                tempPaths.add(tempSongList.get(i).getPath());
+                tempGenres.add(tempSongList.get(i).getGenre());
+                tempArtists.add(tempSongList.get(i).getArtist());
+            }
+
+            try {
+                populateListFirstTime(tempPaths,tempTitles,tempArtists,tempGenres);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        }
+    }
+
+
 
 }
 
