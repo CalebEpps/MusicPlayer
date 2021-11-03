@@ -25,10 +25,12 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
      */
 
     protected Song[] songs;
+    private OnItemClickListener listener;
 
 
-    public SongAdapter(Song[] songs) {
+    public SongAdapter(Song[] songs, OnItemClickListener listener) {
         this.songs = songs;
+        this.listener = listener;
     }
 
 
@@ -45,11 +47,9 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Song song = songs[position];
         holder.songTitle.setText(song.getTitle());
-
-
-
-
+        holder.bind(songs[position],listener);
     }
+
 
     @Override
     public int getItemCount() {
@@ -67,5 +67,18 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
             this.songTitle = (TextView)  itemView.findViewById(R.id.songTitle);
             constraintLayout = (ConstraintLayout) itemView.findViewById(R.id.constraintLayout);
         }
+
+        public void bind(Song song, final OnItemClickListener listener) {
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    listener.onItemClick(song);
+                }
+            });
+        }
+    }
+
+    public interface OnItemClickListener {
+        void onItemClick(Song item);
     }
 }

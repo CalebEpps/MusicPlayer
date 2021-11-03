@@ -181,7 +181,12 @@ public class MainActivity extends AppCompatActivity {
         songArr = parser.getEntries();
         if(songArr != null) {
             RecyclerView recyclerView = findViewById(R.id.songList);
-            SongAdapter adapter = new SongAdapter(songArr);
+            SongAdapter adapter = new SongAdapter(songArr, new SongAdapter.OnItemClickListener() {
+                @Override
+                public void onItemClick(Song item) {
+                    toastGeneric(item.getTitle());
+                }
+            });
             recyclerView.setHasFixedSize(false);
             recyclerView.setLayoutManager(new LinearLayoutManager(this));
             handler.postDelayed(timeRunnable,0);
@@ -619,7 +624,12 @@ public class MainActivity extends AppCompatActivity {
                     // This code will parse our JSON file and reset the recycler view to include all of our added songs.
                     Song[] getAllSongsAfter = parser.getEntries();
                     RecyclerView recyclerView = (RecyclerView) findViewById(R.id.songList);
-                    SongAdapter adapter = new SongAdapter(getAllSongsAfter);
+                    SongAdapter adapter = new SongAdapter(getAllSongsAfter, new SongAdapter.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(Song item) {
+                          toastGeneric(item.getTitle());
+                        }
+                    });
                     recyclerView.setAdapter(adapter);
                     handler.removeCallbacks(timeRunnable);
                     handler.postDelayed(timeRunnable,0);
@@ -637,7 +647,12 @@ public class MainActivity extends AppCompatActivity {
                         songArr = parser.getEntries();
                         if (songArr != null) {
                             RecyclerView recyclerView = (RecyclerView) findViewById(R.id.songList);
-                            SongAdapter adapter = new SongAdapter(songArr);
+                            SongAdapter adapter = new SongAdapter(songArr, new SongAdapter.OnItemClickListener() {
+                                @Override
+                                public void onItemClick(Song item) {
+                                    toastGeneric(item.getTitle());
+                                }
+                            });
                             recyclerView.setHasFixedSize(false);
                             recyclerView.setLayoutManager(new LinearLayoutManager(this));
                             recyclerView.setAdapter(adapter);
