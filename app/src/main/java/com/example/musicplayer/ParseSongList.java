@@ -292,7 +292,7 @@ public class ParseSongList extends AppCompatActivity {
         boolean foundSong = false;
 
         if(allSongs != null) {
-            Log.e("REACHED IF DELTE", "REACHED IF DELETE");
+            Log.e("REACHED IF DELETE", "REACHED IF DELETE");
         for(int i = 0; i < allSongs.size(); i++) {
             if (allSongs.get(i).getTitle().equals(songTitle)) {
                 Log.e("SONG TO DELETE FOUND", "SONG TO DELETE FOUND");

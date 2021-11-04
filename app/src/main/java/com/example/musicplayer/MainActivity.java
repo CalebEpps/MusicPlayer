@@ -130,6 +130,19 @@ public class MainActivity extends AppCompatActivity {
 
         }
     };
+
+    boolean tooSoonToSearch = false;
+    Runnable preventionRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if(tooSoonToSearch) {
+                tooSoonToSearch = false;
+            } else {
+                tooSoonToSearch = true;
+            }
+            handler.postDelayed(preventionRunnable, 1000);
+        }
+    };
 // This seekbar runnable updates the seek bar every second :D
     Runnable seekBarRunnable = new Runnable() {
         @Override
@@ -240,6 +253,7 @@ public class MainActivity extends AppCompatActivity {
         handler.postDelayed(adRunnable,0);
         // Gotta start ALL THE HANDLER RUNNABLES LET'S GOOOOO
         handler.postDelayed(seekBarRunnable,0);
+        handler.postDelayed(preventionRunnable,0);
 
 
         // Initialize our search bar
@@ -249,26 +263,26 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public boolean onQueryTextSubmit(String s) {
-                if(songArr != null) {
+                if (s.isEmpty()) {
+                    Log.e("CLEARING", "CLEARING SEARCHES...");
+                    adapter.updateList(songArr);
+                } else if (s != null) {
                     queriedResults = parser.search(s);
                     adapter.updateList(queriedResults);
-                  //  resetSongsAfterSearch(queriedResults);
-
                 }
                 return false;
             }
+
 
             @Override
             public boolean onQueryTextChange(String s) {
                 if(s.isEmpty()) {
                     Log.e("CLEARING", "CLEARING SEARCHES...");
-                    ArrayList<Song> songReset= parser.getEntries();
                     adapter.updateList(songArr);
-                    //recyclerView.setAdapter(adapter);
+                } else if(s != null && !tooSoonToSearch) {
+                    queriedResults = parser.search(s);
+                    adapter.updateList(queriedResults);
                 }
-
-
-
                 return false;
             }
         });
