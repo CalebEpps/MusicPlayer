@@ -13,8 +13,6 @@ public class Song {
     protected int currentTime = 0;
     protected CyclicDoubleInt.IntNode seekToNode;
     protected CyclicDoubleInt skipTimeCDLL = new CyclicDoubleInt();
-    boolean checkFF = false;
-    boolean checkRW = false;
 
 // LITERALLY GENERATED THE GETTERS AND SETTERS  NOT SURE WHY IT PUT THESE TWO UP HERE :D
     public String getArtist() {

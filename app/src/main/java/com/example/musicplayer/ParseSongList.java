@@ -265,7 +265,7 @@ public class ParseSongList extends AppCompatActivity {
     }
 // Search method for returning an arraylist of songs that contain
     // the search string
-    public ArrayList<Song> search(String searchStr) {
+    public Song[] search(String searchStr) {
         Song[] allSongs = getEntries();
         if(allSongs != null) {
             ArrayList<Song> queriedSongs = new ArrayList<>();
@@ -274,11 +274,14 @@ public class ParseSongList extends AppCompatActivity {
                 if (allSongs[i].getTitle().contains(searchStr) ||
                         allSongs[i].getArtist().contains(searchStr) ||
                         allSongs[i].getGenre().contains(searchStr)) {
+                    Log.e("SEARCHING...", allSongs[i].getTitle() + " FOUND");
                     queriedSongs.add(allSongs[i]);
                 }
             }
+            Song[] toReturn = new Song[queriedSongs.size()];
+            toReturn = queriedSongs.toArray(toReturn);
             // Return the songs containing the key words
-            return queriedSongs;
+            return toReturn;
             // Else statement to return null if needed
         } else {
             return null;
@@ -291,12 +294,19 @@ public class ParseSongList extends AppCompatActivity {
         boolean foundSong = false;
 
         if(allSongs != null) {
+            Log.e("REACHED IF DELTE", "REACHED IF DELETE");
         for(int i = 0; i < allSongs.length; i++) {
             if (allSongs[i].getTitle().equals(songTitle)) {
-                ArrayUtils.remove(allSongs, i);
+                Log.e("SONG TO DELETE FOUND", "SONG TO DELETE FOUND");
+                Log.e("Song to Delete", allSongs[i].getTitle());
+                allSongs = ArrayUtils.remove(allSongs, i);
+
                 foundSong = true;
-                break;
             }
+        }
+
+        for(int i = 0; i < allSongs.length; i++) {
+            Log.e("Song is gone?", allSongs[i].getTitle());
         }
 
         }
@@ -316,7 +326,11 @@ public class ParseSongList extends AppCompatActivity {
             }
 
             try {
-                populateListFirstTime(tempPaths,tempTitles,tempArtists,tempGenres);
+                if(!tempPaths.isEmpty()) {
+                    populateListFirstTime(tempPaths, tempTitles, tempArtists, tempGenres);
+                } else {
+                    deleteAll();
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }

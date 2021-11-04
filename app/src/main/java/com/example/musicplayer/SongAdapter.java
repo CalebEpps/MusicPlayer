@@ -51,6 +51,11 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
     }
 
 
+    public Song getSong(int position) {
+        return songs != null ? songs[position] : null;
+    }
+
+
     @Override
     public int getItemCount() {
         ParseSongList parser = new ParseSongList();
@@ -59,7 +64,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
     }
 
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public TextView songTitle;
         public ConstraintLayout constraintLayout;
         public ViewHolder(View itemView) {
@@ -67,7 +72,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
             this.songTitle = (TextView)  itemView.findViewById(R.id.songTitle);
             constraintLayout = (ConstraintLayout) itemView.findViewById(R.id.constraintLayout);
         }
-
+// Method for setting the onClick listener for each item in our recyclerView
         public void bind(Song song, final OnItemClickListener listener) {
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -75,6 +80,11 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
                     listener.onItemClick(song);
                 }
             });
+        }
+
+        @Override
+        public void onClick(View view) {
+
         }
     }
 
