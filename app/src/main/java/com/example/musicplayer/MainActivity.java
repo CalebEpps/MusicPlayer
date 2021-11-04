@@ -3,9 +3,6 @@ package com.example.musicplayer;
 import static android.content.ContentValues.TAG;
 
 import android.Manifest;
-import android.app.AlarmManager;
-import android.app.PendingIntent;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
@@ -32,13 +29,9 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import org.apache.commons.lang3.ArrayUtils;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
 
 import abhishekti7.unicorn.filepicker.UnicornFilePicker;
 import abhishekti7.unicorn.filepicker.utils.Constants;
@@ -76,7 +69,6 @@ public class MainActivity extends AppCompatActivity {
 
     // Queried Songs from search :D
    ArrayList<Song> queriedResults;
-   SongAdapter newAdapter;
 
    // NEW Class-Wide Adapter. Much More efficient. Declared
     // in the onCreate Method Below. Same as new Adapter (Search Results adapter)
@@ -88,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
     // This is our CDLL that we use to do... Most everything. :D
     // (Props to Alessa for making a great CDLL class)
     CyclicDouble CDLList = new CyclicDouble();
-    Node nextSong;
+    Node currentSong;
     CyclicDoubleInt.IntNode tempNode;
 
     // Only allows the user to choose popular audio file types.
@@ -173,42 +165,22 @@ public class MainActivity extends AppCompatActivity {
 
         recyclerView = findViewById(R.id.songList);
 
-        newAdapter = new SongAdapter(queriedResults, new SongAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(Song item) {
-                // This is the onClick() Method for each item in the recycler view.
-               //position = recyclerView.getChildAdapterPosition(recyclerView);
-              //  Log.e("Position Clicked:", String.valueOf(position));
-                /*toastGeneric(item.getTitle());
-                // Delete Song Method removes the song from our records. Poof
-                parser.deleteSong(item.getTitle());
-                // Release and recreate the music Player
-                mp.release();
-                mp = new MediaPlayer();
-                // Finish the activity and relaunch it. This is temporary.
-                // A better solution is to dynamically update the recyclerView
-                // That just takes time.
-                finish();
-                overridePendingTransition(0, 0);
-                startActivity(getIntent());
-                overridePendingTransition(0, 0);*/
-            }
-        });
-
         adapter= new SongAdapter(songArr, new SongAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(Song item) {
                 Log.e("Position Clicked:", String.valueOf(item.getAbsolutePlaceInList()));
-                /*toastGeneric(item.getTitle());
-                parser.deleteSong(item.getTitle());
-                mp.release();
-                mp = new MediaPlayer();
-                finish();
-                overridePendingTransition(0, 0);
-                startActivity(getIntent());
-                overridePendingTransition(0, 0);
-            }*/
-            }});
+                currentSong = CDLList.traverseTo(currentSong, item.getTitle());
+                String pathToPlay = currentSong.song.getPath();
+                try {
+                    mp.reset();
+                    mp.setDataSource(pathToPlay);
+                    mp.prepareAsync();
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                }
+            });
 
         recyclerView = findViewById(R.id.songList);
 
@@ -301,7 +273,7 @@ public class MainActivity extends AppCompatActivity {
             // Is there already a song in our CDLL? Cool fuckin' play that shit.
             // Remember this is only called if the song array isn't empty
             // which in turn means our CDLList isn't empty either.
-            nextSong = CDLList.head;
+            currentSong = CDLList.head;
             // Just a testing Log.
             Log.e("DID POPULATE?:",CDLList.toString());
             adapter.updateList(songArr);
@@ -332,7 +304,7 @@ public class MainActivity extends AppCompatActivity {
             public void onPrepared(MediaPlayer mp) {
                 // Okay so this will start our audio ONCE IT'S READY
                 playButton.setImageDrawable(getResources().getDrawable(R.drawable.pause_btn));
-                currentlyPlaying = nextSong.song.getTitle();
+                currentlyPlaying = currentSong.song.getTitle();
                 songTitle.setText(currentlyPlaying);
                 currentlyPlayingText.setText("Currently Playing:");
                 seekBar.setMax(mp.getDuration() / 1000);
@@ -350,11 +322,11 @@ public class MainActivity extends AppCompatActivity {
                     public void onCompletion(MediaPlayer mediaPlayer) {
                         mp.reset();
                         try {
-                            if (nextSong.next != null) {
-                                nextSong = nextSong.next;
+                            if (currentSong.next != null) {
+                                currentSong = currentSong.next;
 
                             }
-                            String pathToPlay = nextSong.song.getPath();
+                            String pathToPlay = currentSong.song.getPath();
 
 
                             try {
@@ -404,19 +376,19 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 // Gotta populate our CDLL RQ, Hol' up.
-                if (nextSong != null) {
-                    nextSong.song.populateFastFoward(mp);
+                if (currentSong != null) {
+                    currentSong.song.populateFastFoward(mp);
                     // Log.e("CURRENT MP TIME", String.valueOf(mp.getCurrentPosition()));
-                    Log.e("FF NODE TIME", String.valueOf(nextSong.song.seekToNode.data));
+                    Log.e("FF NODE TIME", String.valueOf(currentSong.song.seekToNode.data));
                     //  Log.e("FFBTN", String.valueOf(mp.getDuration()));
                     // Remember fast forward is a method that does seekToNode = seekToNode.next;
-                    nextSong.song.fastFoward(mp);
+                    currentSong.song.fastFoward(mp);
                     // So this is a little weird.... Let's go piece by piece shall we? Yes.
                     // mp.seekTo goes to that time in the song.
                     // nextSong.song gets the song object that currently exists in the nextSong node.
                     // .seekToNode is our node within the song object.
                     // .data gets that number for us.
-                    mp.seekTo(nextSong.song.seekToNode.data);
+                    mp.seekTo(currentSong.song.seekToNode.data);
                     // So these are just some logs that will let everyone know it is indeed skipping 30 secs
                     // into the future.
                     Log.e("CURRENT MP TIME", String.valueOf(mp.getCurrentPosition()));
@@ -432,16 +404,16 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onLongClick(View view) {
                 // Rip byyyyyyye nodes.
-                if (nextSong != null) {
-                    nextSong.song.skipTimeCDLL.deleteAllNodes();
+                if (currentSong != null) {
+                    currentSong.song.skipTimeCDLL.deleteAllNodes();
                     // Repopulate the song's CDLL
-                    nextSong.song.populateFastFoward(mp);
+                    currentSong.song.populateFastFoward(mp);
                     // Sett the time 30 seconds into the future
                     // (We're assuming the user wanted to fast forward on the
                     // long press.
-                    nextSong.song.fastFoward(mp);
+                    currentSong.song.fastFoward(mp);
                     // Aww yeah you know what time it is.
-                    mp.seekTo(nextSong.song.seekToNode.data);
+                    mp.seekTo(currentSong.song.seekToNode.data);
                     // So apparently you have to return a boolean with
                 } else {
                     toastGeneric("There is no song playing right now.");
@@ -455,11 +427,11 @@ public class MainActivity extends AppCompatActivity {
         rewBtn.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
-                if(nextSong != null) {
-                    nextSong.song.skipTimeCDLL.deleteAllNodes();
-                    nextSong.song.populateRewind(mp);
-                    nextSong.song.rewind();
-                    mp.seekTo(nextSong.song.seekToNode.data);
+                if(currentSong != null) {
+                    currentSong.song.skipTimeCDLL.deleteAllNodes();
+                    currentSong.song.populateRewind(mp);
+                    currentSong.song.rewind();
+                    mp.seekTo(currentSong.song.seekToNode.data);
                 } else {
                     toastGeneric("There is no song playing right now.");
                 }
@@ -473,13 +445,13 @@ public class MainActivity extends AppCompatActivity {
         rewBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(nextSong != null) {
+                if(currentSong != null) {
                     //  Log.e("CURRENT MP TIME", String.valueOf(mp.getCurrentPosition()));
-                    nextSong.song.populateRewind(mp);
-                    Log.e("RW NODE TIME", String.valueOf(nextSong.song.seekToNode.data));
+                    currentSong.song.populateRewind(mp);
+                    Log.e("RW NODE TIME", String.valueOf(currentSong.song.seekToNode.data));
                     //  Log.e("RWBTN", String.valueOf(mp.getDuration()));
-                    nextSong.song.rewind();
-                    mp.seekTo(nextSong.song.seekToNode.data);
+                    currentSong.song.rewind();
+                    mp.seekTo(currentSong.song.seekToNode.data);
                     Log.e("CURRENT MP TIME", String.valueOf(mp.getCurrentPosition()));
                   //  toastGeneric("The Current Time of the Song is: " + String.valueOf((mp.getCurrentPosition() / 1000)) + " seconds.");
                 } else {
@@ -495,7 +467,7 @@ public class MainActivity extends AppCompatActivity {
         playButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (nextSong != null) {
+                if (currentSong != null) {
                     try {
                         // This is our pause functionality here
                         if (mp.isPlaying()) {
@@ -511,7 +483,7 @@ public class MainActivity extends AppCompatActivity {
                                 mp.start();
                             } else {
                                 //   Log.e("MP PLAY BUTTON","MP PLAY BUTTON SAYS MP WAS STOPPED");
-                                String pathToPlay = nextSong.song.getPath();
+                                String pathToPlay = currentSong.song.getPath();
                                 mp.setDataSource(pathToPlay);
                                 mp.prepareAsync();
                                 isMPStopped = false;
@@ -537,11 +509,11 @@ public class MainActivity extends AppCompatActivity {
                         mp.reset();
                         // It will throw an error if it can't skip,
                         // so we need to make sure that the next node exists. :)
-                        if(nextSong.next != null) {
-                            nextSong = nextSong.next;
+                        if(currentSong.next != null) {
+                            currentSong = currentSong.next;
 
                         }
-                        String pathToPlay = nextSong.song.getPath();
+                        String pathToPlay = currentSong.song.getPath();
                         mp.setDataSource(pathToPlay);
                         mp.prepareAsync();
                     } else {
@@ -562,10 +534,10 @@ public class MainActivity extends AppCompatActivity {
                         mp.reset();
                         // Same as above, we need to make sure the previous node
                         // is not null.
-                        if(nextSong.previous != null) {
-                            nextSong = nextSong.previous;
+                        if(currentSong.previous != null) {
+                            currentSong = currentSong.previous;
                         }
-                        String pathToPlay = nextSong.song.getPath();
+                        String pathToPlay = currentSong.song.getPath();
                         mp.setDataSource(pathToPlay);
                         mp.prepareAsync();
                     } else {
@@ -764,8 +736,8 @@ public class MainActivity extends AppCompatActivity {
                             CDLList.insertNode(new Song(titles.get(i), paths.get(i)));
                             Log.e("CDLL POPULATED:", CDLList.head.song.getTitle());
                         }
-                        nextSong = CDLList.head;
-                        String pathToPlay = nextSong.song.getPath();
+                        currentSong = CDLList.head;
+                        String pathToPlay = currentSong.song.getPath();
                         try {
                             mp.setDataSource(pathToPlay);
                             mp.prepareAsync();

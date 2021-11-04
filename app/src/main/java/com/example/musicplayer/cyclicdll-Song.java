@@ -28,6 +28,13 @@ class CyclicDouble {
       }
    }
 
+   public Node traverseTo(Node node, String title) {
+      while(node.song.getTitle() != title) {
+         node = node.next;
+      }
+      return node;
+   }
+
 
    
    /*public void printList() {
