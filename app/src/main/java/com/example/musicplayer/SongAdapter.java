@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -28,7 +29,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
      */
 
     protected ArrayList<Song> songs;
-    private OnItemClickListener listener;
+    private final OnItemClickListener listener;
 
 
     public SongAdapter(ArrayList<Song> songs, OnItemClickListener listener) {
@@ -49,23 +50,20 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Song song = songs.get(position);
+        int currentPosition = holder.getAdapterPosition();
         holder.songTitle.setText(song.getTitle());
         holder.bind(songs.get(position),listener);
     }
 
     @Override
     public int getItemCount() {
-        return songs.size();
+        if(songs != null) {
+            return songs.size();
+        }
+        else {
+            return 0;
+        }
     }
-
-
-    public Song getSong(int position) {
-        return songs != null ? songs.get(position) : null;
-    }
-
-
-
-
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public TextView songTitle;
@@ -75,12 +73,14 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
             this.songTitle = (TextView)  itemView.findViewById(R.id.songTitle);
             constraintLayout = (ConstraintLayout) itemView.findViewById(R.id.constraintLayout);
         }
+
 // Method for setting the onClick listener for each item in our recyclerView
-        public void bind(Song song, final OnItemClickListener listener) {
+        public void bind(final Song song, final OnItemClickListener listener) {
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-
+                    song.placeInList = getAdapterPosition();
+                    listener.onItemClick(song);
                 }
             });
         }

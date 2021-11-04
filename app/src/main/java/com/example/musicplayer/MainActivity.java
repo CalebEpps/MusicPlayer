@@ -72,27 +72,18 @@ public class MainActivity extends AppCompatActivity {
     // This is our array of songs for the recyclerView
     ArrayList<Song> songArr;
 
+    RecyclerView recyclerView;
+
     // Queried Songs from search :D
    ArrayList<Song> queriedResults;
-   SongAdapter newAdapter = new SongAdapter(queriedResults, new SongAdapter.OnItemClickListener() {
-       @Override
-       public void onItemClick(Song item) {
-           // This is the onClick() Method for each item in the recycler view.
-           toastGeneric(item.getTitle());
-           // Delete Song Method removes the song from our records. Poof
-           parser.deleteSong(item.getTitle());
-           // Release and recreate the music Player
-           mp.release();
-           mp = new MediaPlayer();
-           // Finish the activity and relaunch it. This is temporary.
-           // A better solution is to dynamically update the recyclerView
-           // That just takes time.
-           finish();
-           overridePendingTransition(0, 0);
-           startActivity(getIntent());
-           overridePendingTransition(0, 0);
-       }
-   });
+   SongAdapter newAdapter;
+
+   // NEW Class-Wide Adapter. Much More efficient. Declared
+    // in the onCreate Method Below. Same as new Adapter (Search Results adapter)
+    SongAdapter adapter;
+
+    // Variable to hold our recycler view click position so we can traverse correctly.
+    int position;
 
     // This is our CDLL that we use to do... Most everything. :D
     // (Props to Alessa for making a great CDLL class)
@@ -167,6 +158,50 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        recyclerView = findViewById(R.id.songList);
+
+        newAdapter = new SongAdapter(queriedResults, new SongAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(Song item) {
+                // This is the onClick() Method for each item in the recycler view.
+               //position = recyclerView.getChildAdapterPosition(recyclerView);
+              //  Log.e("Position Clicked:", String.valueOf(position));
+                /*toastGeneric(item.getTitle());
+                // Delete Song Method removes the song from our records. Poof
+                parser.deleteSong(item.getTitle());
+                // Release and recreate the music Player
+                mp.release();
+                mp = new MediaPlayer();
+                // Finish the activity and relaunch it. This is temporary.
+                // A better solution is to dynamically update the recyclerView
+                // That just takes time.
+                finish();
+                overridePendingTransition(0, 0);
+                startActivity(getIntent());
+                overridePendingTransition(0, 0);*/
+            }
+        });
+
+        adapter= new SongAdapter(songArr, new SongAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(Song item) {
+                Log.e("Position Clicked:", String.valueOf(item.getAbsolutePlaceInList()));
+                /*toastGeneric(item.getTitle());
+                parser.deleteSong(item.getTitle());
+                mp.release();
+                mp = new MediaPlayer();
+                finish();
+                overridePendingTransition(0, 0);
+                startActivity(getIntent());
+                overridePendingTransition(0, 0);
+            }*/
+            }});
+
+        recyclerView = findViewById(R.id.songList);
+
+
+
+
         // these are super important, I added it super late which is why it's
         // at the top lol
         TextView songTitle = findViewById(R.id.songTitle);
@@ -216,7 +251,8 @@ public class MainActivity extends AppCompatActivity {
             public boolean onQueryTextSubmit(String s) {
                 if(songArr != null) {
                     queriedResults = parser.search(s);
-                    resetSongsAfterSearch(queriedResults);
+                    adapter.updateList(queriedResults);
+                  //  resetSongsAfterSearch(queriedResults);
 
                 }
                 return false;
@@ -224,26 +260,14 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public boolean onQueryTextChange(String s) {
-                if(s == "") {
-                    ArrayList<Song> getAllSongsAfter = parser.getEntries();
-                    RecyclerView recyclerView = (RecyclerView) findViewById(R.id.songList);
-                    SongAdapter adapter = new SongAdapter(getAllSongsAfter, new SongAdapter.OnItemClickListener() {
-                        @Override
-                        public void onItemClick(Song item) {
-                            toastGeneric(item.getTitle());
-                            parser.deleteSong(item.getTitle());
-                            mp.release();
-                            mp = new MediaPlayer();
-                            finish();
-                            overridePendingTransition(0, 0);
-                            startActivity(getIntent());
-                            overridePendingTransition(0, 0);
-                        }
-                    });
-                    recyclerView.setAdapter(adapter);
+                if(s.isEmpty()) {
+                    Log.e("CLEARING", "CLEARING SEARCHES...");
+                    ArrayList<Song> songReset= parser.getEntries();
+                    adapter.updateList(songArr);
+                    //recyclerView.setAdapter(adapter);
                 }
 
-                newAdapter.updateList(songArr);
+
 
                 return false;
             }
@@ -254,26 +278,6 @@ public class MainActivity extends AppCompatActivity {
         songArr = parser.getEntries();
         if(songArr != null) {
             RecyclerView recyclerView = findViewById(R.id.songList);
-            SongAdapter adapter = new SongAdapter(songArr, new SongAdapter.OnItemClickListener() {
-                @Override
-                public void onItemClick(Song item) {
-                    // This is the onClick() Method for each item in the recycler view.
-                    toastGeneric(item.getTitle());
-                    // Delete Song Method removes the song from our records. Poof
-                    parser.deleteSong(item.getTitle());
-                    // Release and recreate the music Player
-                    mp.release();
-                    mp = new MediaPlayer();
-                    // Finish the activity and relaunch it. This is temporary.
-                    // A better solution is to dynamically update the recyclerView
-                    // That just takes time.
-                    finish();
-                    overridePendingTransition(0, 0);
-                    startActivity(getIntent());
-                    overridePendingTransition(0, 0);
-
-                }
-            });
             recyclerView.setHasFixedSize(false);
             recyclerView.setLayoutManager(new LinearLayoutManager(this));
             // Populates our CDLL With songs at startup.
@@ -286,7 +290,7 @@ public class MainActivity extends AppCompatActivity {
             nextSong = CDLList.head;
             // Just a testing Log.
             Log.e("DID POPULATE?:",CDLList.toString());
-
+            adapter.updateList(songArr);
             recyclerView.setAdapter(adapter);
         } else {
             // RIP There aren't any songs which means this is a first time load,
@@ -711,20 +715,8 @@ public class MainActivity extends AppCompatActivity {
                     // This code will parse our JSON file and reset the recycler view to include all of our added songs.
                     ArrayList<Song> getAllSongsAfter = parser.getEntries();
                     RecyclerView recyclerView = (RecyclerView) findViewById(R.id.songList);
-                    SongAdapter adapter = new SongAdapter(getAllSongsAfter, new SongAdapter.OnItemClickListener() {
-                        @Override
-                        public void onItemClick(Song item) {
-                            toastGeneric(item.getTitle());
-                            parser.deleteSong(item.getTitle());
-                            mp.release();
-                            mp = new MediaPlayer();
-                            finish();
-                            overridePendingTransition(0, 0);
-                            startActivity(getIntent());
-                            overridePendingTransition(0, 0);
-                        }
-                    });
-                    recyclerView.setAdapter(adapter);
+                    adapter.updateList(getAllSongsAfter);
+                 //   recyclerView.setAdapter(adapter);
 
 
 
@@ -740,22 +732,10 @@ public class MainActivity extends AppCompatActivity {
                         songArr = parser.getEntries();
                         if (songArr != null) {
                             RecyclerView recyclerView = (RecyclerView) findViewById(R.id.songList);
-                            SongAdapter adapter = new SongAdapter(songArr, new SongAdapter.OnItemClickListener() {
-                                @Override
-                                public void onItemClick(Song item) {
-                                    toastGeneric(item.getTitle());
-                                    parser.deleteSong(item.getTitle());
-                                    mp.release();
-                                    mp = new MediaPlayer();
-                                    finish();
-                                    overridePendingTransition(0, 0);
-                                    startActivity(getIntent());
-                                    overridePendingTransition(0, 0);
-                                }
-                            });
                             recyclerView.setHasFixedSize(false);
                             recyclerView.setLayoutManager(new LinearLayoutManager(this));
-                            recyclerView.setAdapter(adapter);
+                            adapter.updateList(songArr);
+                        //    recyclerView.setAdapter(adapter);
                         } else {
                             // This prolly means something went wrong RIP :(
                             // You should NOT hit this else block, it's here for reference
@@ -794,8 +774,7 @@ public class MainActivity extends AppCompatActivity {
         public void resetSongsAfterSearch(ArrayList<Song> songArr) {
             RecyclerView recyclerView = findViewById(R.id.songList);
             Log.e("RV RESET", "RECYCLER VIEW RESET IN RESET SONGS AFTER SEARCH");
-            newAdapter.updateList(songArr);
-            recyclerView.setAdapter(newAdapter);
+            adapter.updateList(songArr);
         }
 
 // I love love love this little method. It allows me to basically throw any text to the screen

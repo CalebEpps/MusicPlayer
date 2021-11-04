@@ -12,6 +12,20 @@ public class Song {
     protected CyclicDoubleInt.IntNode seekToNode;
     protected CyclicDoubleInt skipTimeCDLL = new CyclicDoubleInt();
 
+    public int getPlaceInList() {
+        return placeInList;
+    }
+
+    public int getAbsolutePlaceInList() {
+        return placeInList + 1;
+    }
+
+    public void setPlaceInList(int placeInList) {
+        this.placeInList = placeInList;
+    }
+
+    int placeInList;
+
 // LITERALLY GENERATED THE GETTERS AND SETTERS  NOT SURE WHY IT PUT THESE TWO UP HERE :D
     public String getArtist() {
         return artist;
