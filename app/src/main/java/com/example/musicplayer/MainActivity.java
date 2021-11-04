@@ -168,7 +168,7 @@ public class MainActivity extends AppCompatActivity {
         adapter= new SongAdapter(songArr, new SongAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(Song item) {
-                Log.e("Position Clicked:", String.valueOf(item.getAbsolutePlaceInList()));
+                Log.e("Position Clicked:", String.valueOf(item.getPlaceInList()) + item.getTitle());
                 currentSong = CDLList.traverseTo(currentSong, item.getTitle());
                 String pathToPlay = currentSong.song.getPath();
                 try {
@@ -180,7 +180,7 @@ public class MainActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
                 }
-            });
+        });
 
         recyclerView = findViewById(R.id.songList);
 

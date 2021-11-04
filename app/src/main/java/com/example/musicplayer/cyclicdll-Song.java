@@ -1,4 +1,7 @@
 package com.example.musicplayer;
+
+import android.util.Log;
+
 /*
 Alessa's Implementation of a CDLL (Slighly Rearranged by
 ya boy to make it work better for the song objects)
@@ -6,6 +9,7 @@ ya boy to make it work better for the song objects)
 class CyclicDouble {
    //initially head is set to null
    Node head = null;
+   private final String TAG = "Traverse";
    
    public void insertNode(Song song){
       
@@ -29,8 +33,15 @@ class CyclicDouble {
    }
 
    public Node traverseTo(Node node, String title) {
+      Node tempNode = node;
       while(node.song.getTitle() != title) {
          node = node.next;
+         Log.e(TAG,"comparing that title to:" + node.song.getTitle());
+        // Log.e("Traverse", "Not Found yet :(");
+         if(tempNode.song.getTitle() == node.song.getTitle()) {
+            Log.e(TAG,"Found!");
+            return node;
+         }
       }
       return node;
    }
