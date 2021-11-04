@@ -95,7 +95,7 @@ public class ParseSongList extends AppCompatActivity {
     public void populateExistingList(ArrayList paths, ArrayList names, ArrayList artists, ArrayList genres) {
 
         Log.e("RUNNING PEL", "RUNNING...");
-        Song[] existingSongs = getEntries();
+        ArrayList<Song> existingSongs = getEntries();
 
         // If API version is > 30, we need to write/read to docs folder, NOT our own.
         if (SDK_INT >= Build.VERSION_CODES.R) {
@@ -133,8 +133,8 @@ public class ParseSongList extends AppCompatActivity {
                 newEntry.put("genre", genres.get(i));
                 boolean alreadyAdded = false;
                 // Nested for loop checks for duplicates.
-                for(int j = 0; j < existingSongs.length; j++) {
-                    if(newEntry.get("songPath").equals(existingSongs[j].getPath())) {
+                for(int j = 0; j < existingSongs.size(); j++) {
+                    if(newEntry.get("songPath").equals(existingSongs.get(j).getPath())) {
                         alreadyAdded = true;
                         break;
                     }
@@ -199,7 +199,7 @@ public class ParseSongList extends AppCompatActivity {
         return counter;
     }
 
-    public Song[] getEntries()  {
+    public ArrayList<Song> getEntries()  {
         // If API version is > 30, we need to write/read to docs folder, NOT our own.
         if (SDK_INT >= Build.VERSION_CODES.R) {
             filePathEnd = "Documents";
@@ -224,11 +224,11 @@ public class ParseSongList extends AppCompatActivity {
             return null;
         }
         //      Log.e("SIZE GETENTRIES:", String.valueOf(jsonArray.size()));
-            Song[] songs = new Song[jsonArray.size()];
+            ArrayList<Song> songs = new ArrayList<>();
             //Log.e("OBJECT TEST:", String.valueOf(jsonArray));
-            for (int i = 0; i < songs.length; i++) {
+            for (int i = 0; i < jsonArray.size(); i++) {
                 JSONObject jsonObj = (JSONObject) jsonArray.get(i);
-                songs[i] = new Song(jsonObj.get("songTitle").toString(),jsonObj.get("songPath").toString(),jsonObj.get("artist").toString(),jsonObj.get("genre").toString());
+                songs.add(new Song(jsonObj.get("songTitle").toString(),jsonObj.get("songPath").toString(),jsonObj.get("artist").toString(),jsonObj.get("genre").toString()));
                //    Log.e("PARSE METHOD:", songs[i].getTitle());
                 //    Log.e("OBJECT TEST:", name);
             }
@@ -265,23 +265,21 @@ public class ParseSongList extends AppCompatActivity {
     }
 // Search method for returning an arraylist of songs that contain
     // the search string
-    public Song[] search(String searchStr) {
-        Song[] allSongs = getEntries();
+    public ArrayList<Song> search(String searchStr) {
+        ArrayList<Song> allSongs = getEntries();
         if(allSongs != null) {
             ArrayList<Song> queriedSongs = new ArrayList<>();
 
-            for (int i = 0; i < allSongs.length; i++) {
-                if (allSongs[i].getTitle().contains(searchStr) ||
-                        allSongs[i].getArtist().contains(searchStr) ||
-                        allSongs[i].getGenre().contains(searchStr)) {
-                    Log.e("SEARCHING...", allSongs[i].getTitle() + " FOUND");
-                    queriedSongs.add(allSongs[i]);
+            for (int i = 0; i < allSongs.size(); i++) {
+                if (allSongs.get(i).getTitle().contains(searchStr) ||
+                        allSongs.get(i).getArtist().contains(searchStr) ||
+                        allSongs.get(i).getGenre().contains(searchStr)) {
+                    Log.e("SEARCHING...", allSongs.get(i).getTitle() + " FOUND");
+                    queriedSongs.add(allSongs.get(i));
                 }
             }
-            Song[] toReturn = new Song[queriedSongs.size()];
-            toReturn = queriedSongs.toArray(toReturn);
             // Return the songs containing the key words
-            return toReturn;
+            return queriedSongs;
             // Else statement to return null if needed
         } else {
             return null;
@@ -290,29 +288,29 @@ public class ParseSongList extends AppCompatActivity {
     // Method deletes a single song.
     public void deleteSong(String songTitle) {
 
-        Song[] allSongs = getEntries();
+        ArrayList<Song> allSongs = getEntries();
         boolean foundSong = false;
 
         if(allSongs != null) {
             Log.e("REACHED IF DELTE", "REACHED IF DELETE");
-        for(int i = 0; i < allSongs.length; i++) {
-            if (allSongs[i].getTitle().equals(songTitle)) {
+        for(int i = 0; i < allSongs.size(); i++) {
+            if (allSongs.get(i).getTitle().equals(songTitle)) {
                 Log.e("SONG TO DELETE FOUND", "SONG TO DELETE FOUND");
-                Log.e("Song to Delete", allSongs[i].getTitle());
-                allSongs = ArrayUtils.remove(allSongs, i);
+                Log.e("Song to Delete", allSongs.get(i).getTitle());
+                allSongs.remove(i);
 
                 foundSong = true;
             }
         }
 
-        for(int i = 0; i < allSongs.length; i++) {
-            Log.e("Song is gone?", allSongs[i].getTitle());
+        for(int i = 0; i < allSongs.size(); i++) {
+            Log.e("Song is gone?", allSongs.get(i).getTitle());
         }
 
         }
 
         if(foundSong) {
-            ArrayList<Song> tempSongList = new ArrayList<>(Arrays.asList(allSongs));
+            ArrayList<Song> tempSongList = new ArrayList<>(allSongs);
             ArrayList<String> tempTitles = new ArrayList<>();
             ArrayList<String> tempPaths = new ArrayList<>();
             ArrayList<String> tempGenres = new ArrayList<>();

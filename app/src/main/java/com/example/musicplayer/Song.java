@@ -1,8 +1,6 @@
 package com.example.musicplayer;
 
 import android.media.MediaPlayer;
-import android.provider.MediaStore;
-
 import java.util.ArrayList;
 
 public class Song {

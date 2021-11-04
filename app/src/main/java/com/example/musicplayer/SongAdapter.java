@@ -10,6 +10,9 @@ import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+
 public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
 
     /*
@@ -24,11 +27,11 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
     IF YOU HAVE QUESTIONS ABOUT HOW IT WORKS, HMU.
      */
 
-    protected Song[] songs;
+    protected ArrayList<Song> songs;
     private OnItemClickListener listener;
 
 
-    public SongAdapter(Song[] songs, OnItemClickListener listener) {
+    public SongAdapter(ArrayList<Song> songs, OnItemClickListener listener) {
         this.songs = songs;
         this.listener = listener;
     }
@@ -45,26 +48,26 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Song song = songs[position];
+        Song song = songs.get(position);
         holder.songTitle.setText(song.getTitle());
-        holder.bind(songs[position],listener);
+        holder.bind(songs.get(position),listener);
+    }
+
+    @Override
+    public int getItemCount() {
+        return songs.size();
     }
 
 
     public Song getSong(int position) {
-        return songs != null ? songs[position] : null;
+        return songs != null ? songs.get(position) : null;
     }
 
 
-    @Override
-    public int getItemCount() {
-        ParseSongList parser = new ParseSongList();
-
-        return parser.getLength();
-    }
 
 
-    public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public TextView songTitle;
         public ConstraintLayout constraintLayout;
         public ViewHolder(View itemView) {
@@ -77,7 +80,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    listener.onItemClick(song);
+
                 }
             });
         }
@@ -90,5 +93,10 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
 
     public interface OnItemClickListener {
         void onItemClick(Song item);
+    }
+
+    public void updateList(ArrayList<Song> list){
+        songs = list;
+        notifyDataSetChanged();
     }
 }

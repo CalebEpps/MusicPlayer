@@ -70,10 +70,29 @@ public class MainActivity extends AppCompatActivity {
     ParseSongList parser = new ParseSongList();
 
     // This is our array of songs for the recyclerView
-    Song[] songArr;
+    ArrayList<Song> songArr;
 
     // Queried Songs from search :D
-    Song[] queriedResults;
+   ArrayList<Song> queriedResults;
+   SongAdapter newAdapter = new SongAdapter(queriedResults, new SongAdapter.OnItemClickListener() {
+       @Override
+       public void onItemClick(Song item) {
+           // This is the onClick() Method for each item in the recycler view.
+           toastGeneric(item.getTitle());
+           // Delete Song Method removes the song from our records. Poof
+           parser.deleteSong(item.getTitle());
+           // Release and recreate the music Player
+           mp.release();
+           mp = new MediaPlayer();
+           // Finish the activity and relaunch it. This is temporary.
+           // A better solution is to dynamically update the recyclerView
+           // That just takes time.
+           finish();
+           overridePendingTransition(0, 0);
+           startActivity(getIntent());
+           overridePendingTransition(0, 0);
+       }
+   });
 
     // This is our CDLL that we use to do... Most everything. :D
     // (Props to Alessa for making a great CDLL class)
@@ -205,6 +224,27 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public boolean onQueryTextChange(String s) {
+                if(s == "") {
+                    ArrayList<Song> getAllSongsAfter = parser.getEntries();
+                    RecyclerView recyclerView = (RecyclerView) findViewById(R.id.songList);
+                    SongAdapter adapter = new SongAdapter(getAllSongsAfter, new SongAdapter.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(Song item) {
+                            toastGeneric(item.getTitle());
+                            parser.deleteSong(item.getTitle());
+                            mp.release();
+                            mp = new MediaPlayer();
+                            finish();
+                            overridePendingTransition(0, 0);
+                            startActivity(getIntent());
+                            overridePendingTransition(0, 0);
+                        }
+                    });
+                    recyclerView.setAdapter(adapter);
+                }
+
+                newAdapter.updateList(songArr);
+
                 return false;
             }
         });
@@ -629,7 +669,7 @@ public class MainActivity extends AppCompatActivity {
                     // with the new entries. This allows us to check for duplicates
                     // in the following nested for loop below. It's not the most optimized
                     // thing in the world, but it is relatively straightforward.
-                    Song[] getAllSongsBefore = parser.getEntries();
+                   ArrayList<Song> getAllSongsBefore = parser.getEntries();
                     // This method populates our JSON file
                     parser.populateExistingList(paths, titles, artists, genres);
 
@@ -642,10 +682,10 @@ public class MainActivity extends AppCompatActivity {
                     // Ensure that we add our newly selected songs to our CDLL.
                     // This code should also skip duplicates.
                     for (int i = 0; i < paths.size(); i++) {
-                        for (int j = 0; j < getAllSongsBefore.length; j++) {
+                        for (int j = 0; j < getAllSongsBefore.size(); j++) {
                             // This inner loop checks our previous json file against the
                             // songs that were just selected and changes our boolean for us.
-                            if (getAllSongsBefore[j].getPath().equals(paths.get(i))) {
+                            if (getAllSongsBefore.get(j).getPath().equals(paths.get(i))) {
                                 alreadyExists = true;
                                 Log.e("INNER LOOP: ", "SONG ALREADY EXISTS");
                             } else {
@@ -669,7 +709,7 @@ public class MainActivity extends AppCompatActivity {
                     //    Log.e("CDLL POPULATED:",CDLList.head.song.getTitle());
 
                     // This code will parse our JSON file and reset the recycler view to include all of our added songs.
-                    Song[] getAllSongsAfter = parser.getEntries();
+                    ArrayList<Song> getAllSongsAfter = parser.getEntries();
                     RecyclerView recyclerView = (RecyclerView) findViewById(R.id.songList);
                     SongAdapter adapter = new SongAdapter(getAllSongsAfter, new SongAdapter.OnItemClickListener() {
                         @Override
@@ -751,25 +791,10 @@ public class MainActivity extends AppCompatActivity {
         }
 // This is the same as our regular recyclerView code. This one just changes the array.
     // Currently does NOT work, everything needs to be changed to arraylists.
-        public void resetSongsAfterSearch(Song[] songArr) {
+        public void resetSongsAfterSearch(ArrayList<Song> songArr) {
             RecyclerView recyclerView = findViewById(R.id.songList);
             Log.e("RV RESET", "RECYCLER VIEW RESET IN RESET SONGS AFTER SEARCH");
-            SongAdapter newAdapter = new SongAdapter(songArr, new SongAdapter.OnItemClickListener() {
-                @Override
-                public void onItemClick(Song item) {
-                    toastGeneric(item.getTitle());
-                    parser.deleteSong(item.getTitle());
-                    mp.release();
-                    mp = new MediaPlayer();
-                    finish();
-                    overridePendingTransition(0, 0);
-                    startActivity(getIntent());
-                    overridePendingTransition(0, 0);
-                }
-            });
-
-            recyclerView.setHasFixedSize(false);
-            recyclerView.setLayoutManager(new LinearLayoutManager(this));
+            newAdapter.updateList(songArr);
             recyclerView.setAdapter(newAdapter);
         }
 
