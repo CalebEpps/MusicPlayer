@@ -31,41 +31,6 @@ class CyclicDouble {
                   
       }
    }
-
-   public Node traverseTo(Node node, String title) {
-      Node tempNode = node;
-      while(node.song.getTitle() != title) {
-         node = node.next;
-         Log.e(TAG,"comparing that title to:" + node.song.getTitle());
-        // Log.e("Traverse", "Not Found yet :(");
-         if(tempNode.song.getTitle() == node.song.getTitle()) {
-            Log.e(TAG,"Found!");
-            return node;
-         }
-      }
-      return node;
-   }
-
-
-   
-   /*public void printList() {
-      Node<T> current = head;
-   
-      if (head == null) 
-         System.out.println("[]");
-      else if (head.next == null)
-         System.out.println(current.data);
-      
-      else{
-         do{
-            System.out.print(current.data + " ");
-            current = current.next;
-         }      
-         while(current != head);
-         System.out.println();
-
-         }
-   }*/
    
    public String toString() {
       if (head == null)

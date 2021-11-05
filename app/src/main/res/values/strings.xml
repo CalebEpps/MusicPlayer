@@ -5,4 +5,8 @@
     <string name="version">Version: 0.1.0</string>
     <string name="inputTime">Split the Song by:</string>
     <string name="intputTimeEnd"> Seconds (Up to 30).</string>
+    <string name="editSongTitle">Name:</string>
+    <string name="editSongArtist">Artist:</string>
+    <string name="editSongGenre">Genre:</string>
+    <string name="submitChanges">Save Changes</string>
 </resources>

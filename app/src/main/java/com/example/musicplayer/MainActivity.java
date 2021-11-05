@@ -74,14 +74,10 @@ public class MainActivity extends AppCompatActivity {
     // in the onCreate Method Below. Same as new Adapter (Search Results adapter)
     SongAdapter adapter;
 
-    // Variable to hold our recycler view click position so we can traverse correctly.
-    int position;
-
     // This is our CDLL that we use to do... Most everything. :D
     // (Props to Alessa for making a great CDLL class)
     CyclicDouble CDLList = new CyclicDouble();
     Node currentSong;
-    CyclicDoubleInt.IntNode tempNode;
 
     // Only allows the user to choose popular audio file types.
     String[] filters = {"mp3","ogg","wav","m4a"};
@@ -89,16 +85,23 @@ public class MainActivity extends AppCompatActivity {
     // Here we declare our handler. It allows us to run things asyncronously on the same
     // or different threads.
     Handler handler = new Handler();
+
     // This is the image view of our banner. We'll initialize it a bit later.
     ImageView adBanner;
+    // Classwide current time variable. Can be changed throughout the activity.
     TextView currentTimePlaying;
+    // The seekbar is the bar you can see the song's current time on.
     SeekBar seekBar;
 
-    // These variables are used to process and run the ad banners. :)
+    // These variables are used to process and run the ad banners.
+    // This array holds the integer references for our ads to put them into our ad banner CDLL.
     int[] adBannerPaths = {R.drawable.ad_one, R.drawable.ad_two, R.drawable.ad_three, R.drawable.ad_four,
                            R.drawable.ad_five, R.drawable.ad_seven, R.drawable.ad_eight, R.drawable.ad_nine};
     CyclicDoubleInt adBannerCDLL = new CyclicDoubleInt();
+
+    // This is an integer node because R.*.* returns an int reference to the object.
     CyclicDoubleInt.IntNode currentAd;
+
     // This runnable is infinite and runs every few seconds to change our banner ad.
     Runnable adRunnable = new Runnable() {
         @Override
@@ -111,8 +114,8 @@ public class MainActivity extends AppCompatActivity {
             handler.postDelayed(adRunnable, 8000);
         }
     };
-// BRUUH I DID IT.
-    // Okay so this is a time Runnable. It asyncrounously loads the time for the mediaplyer every second and displays it on the screen in a textview, no toast needed!
+
+    //This is a time Runnable. It asyncrounously loads the time for the mediaplayer every second and displays it on the screen in a textview.
     Runnable timeRunnable = new Runnable() {
         @Override
         public void run() {
@@ -122,7 +125,8 @@ public class MainActivity extends AppCompatActivity {
 
         }
     };
-
+    // This Runnable prevents the search from querying too often. This is an optimization technique
+    // because the search results change every time the search query is updated. We don't want that.
     boolean tooSoonToSearch = false;
     Runnable preventionRunnable = new Runnable() {
         @Override
@@ -132,10 +136,11 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 tooSoonToSearch = true;
             }
-            handler.postDelayed(preventionRunnable, 1000);
+            // Infinite Recursive Call
+            handler.postDelayed(preventionRunnable, 500);
         }
     };
-// This seekbar runnable updates the seek bar every second :D
+// This seekbar runnable updates the seek bar every second.
     Runnable seekBarRunnable = new Runnable() {
         @Override
         public void run() {
@@ -149,31 +154,42 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-// This string is important for setting up our title to display. :D
+// This string is important for setting up our title to display.
     String currentlyPlaying;
 
 
     // This is the variable for our search bar!
     SearchView searchBar;
 
-    // onCreate Method for doing... Everything? That needs to be done at startup.
-    // Dr. Dasgupta, can I have an entire class period to go over this method plz?
+    // onCreate Method for doing... Everything? The on create method
+    // is everything that needs to happen when the app starts.
+    // You'll notice it's quite large, and it's very typical for this
+    // to be the case.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        // We initialize our recycler view immediately
         recyclerView = findViewById(R.id.songList);
-
+        // Next we initialize our adapter. See the Song Adapter
+        // class for more information.
         adapter= new SongAdapter(songArr, new SongAdapter.OnItemClickListener() {
             @Override
-            public void onItemClick(Song item) {
-                Log.e("Position Clicked:", String.valueOf(item.getPlaceInList()) + item.getTitle());
-                currentSong = CDLList.traverseTo(currentSong, item.getTitle());
-                String pathToPlay = currentSong.song.getPath();
+            public void onItemClick(Song clickedSong) {
+                // Test Logs Pre-Traversal of CDLL
+                Log.e("CDLL Test1", currentSong.song.getTitle());
+                Log.e("CDLL Test2", clickedSong.getTitle());
+                // Compare the current song's title to the song that was clicked.
+                while(!currentSong.song.getTitle().equals(clickedSong.getTitle())) {
+                        currentSong = currentSong.next;
+
+                }
+                // Test Log Post Traversal
+                Log.e("CDLL Test", currentSong.song.getTitle());
+                // Reset and run our media player
                 try {
                     mp.reset();
-                    mp.setDataSource(pathToPlay);
+                    mp.setDataSource(currentSong.song.getPath());
                     mp.prepareAsync();
 
                 } catch (IOException e) {
@@ -182,25 +198,19 @@ public class MainActivity extends AppCompatActivity {
                 }
         });
 
-        recyclerView = findViewById(R.id.songList);
-
-
-
-
-        // these are super important, I added it super late which is why it's
-        // at the top lol
+        // The song title and the currently playing text references.
         TextView songTitle = findViewById(R.id.songTitle);
         TextView currentlyPlayingText = findViewById(R.id.textView2);
 
-        // This code locks the phone in portrait mode because FUCK THE INSTANCE STATE STUFF I DON'T HAVE TIME TO IMPLEMENT IT
+        // Allowing the user to rotate their phone resets the activity, and we don't want that.
+        // This line locks the user's phone orientation to portrait mode. Many apps do this.
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        // This is the VERY first thing that runs and it makes sure that we have the permission to access the user's files for reading and writing songs. :)
+        // The permission check method is at the bottom of the Main Activity class.
+        // It will see if the user has granted us permissions. If not, we prompt them.
         permissionCheck(Manifest.permission.WRITE_EXTERNAL_STORAGE, STORAGE_PERMISSION_CODE);
 
-        // Just Grabbing our buttons for java code. Don't mind it.
+        // Just Grabbing our buttons for java.
         Button selectButton = findViewById(R.id.fileSelectBtn);
-        // STOP BUTTON IS INACTIVE. CAN BE ADDED BACK BY UNCOMMENTING RELEVANT CODE
-        // ImageButton stopButton = findViewById(R.id.StopButton);
         ImageButton playButton = findViewById(R.id.playButton);
         ImageButton skipButton = findViewById(R.id.NextBtn);
         ImageButton prevButton = findViewById(R.id.previousBtn);
@@ -230,22 +240,28 @@ public class MainActivity extends AppCompatActivity {
 
         // Initialize our search bar
         searchBar = findViewById(R.id.searchSongs);
-
+        // This is a listener for our search bar. It
+        // Overrides the methods that run when the query changes
+        // or when the submit button (or enter) is pressed.
         searchBar.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
 
             @Override
             public boolean onQueryTextSubmit(String s) {
+                // If the query is empty, then we reset
+                // the adapter because we want to show all songs again
                 if (s.isEmpty()) {
                     Log.e("CLEARING", "CLEARING SEARCHES...");
                     adapter.updateList(songArr);
                 } else if (s != null) {
+                    // If the query isn't empty, we need to call our search method.
+                    // see Parse Song List for more details.
                     queriedResults = parser.search(s);
                     adapter.updateList(queriedResults);
                 }
                 return false;
             }
 
-
+// Same as above except we want this to run if the user presses submit.
             @Override
             public boolean onQueryTextChange(String s) {
                 if(s.isEmpty()) {
@@ -260,7 +276,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-        // Quickly Populates our recycler view song list... IIIIIIIF there are entries
+        // Quickly Populates our recycler view song list. If there are entries.
         songArr = parser.getEntries();
         if(songArr != null) {
             RecyclerView recyclerView = findViewById(R.id.songList);
@@ -270,7 +286,7 @@ public class MainActivity extends AppCompatActivity {
             for (Song song : songArr) {
                 CDLList.insertNode(song);
             }
-            // Is there already a song in our CDLL? Cool fuckin' play that shit.
+            // If there are songs in our CDLL, we will queue and play them.
             // Remember this is only called if the song array isn't empty
             // which in turn means our CDLList isn't empty either.
             currentSong = CDLList.head;
@@ -278,27 +294,20 @@ public class MainActivity extends AppCompatActivity {
             Log.e("DID POPULATE?:",CDLList.toString());
             adapter.updateList(songArr);
             recyclerView.setAdapter(adapter);
-        } else {
-            // RIP There aren't any songs which means this is a first time load,
-            // or we got BIT issues.
-            // Nothing will happen here leaving our CDLL null;
-
         }
-
         // Set our music player to play on launch if possible.
         if(CDLList.head != null) {
             try {
                 mp.setDataSource(CDLList.head.song.getPath());
                 handler.postDelayed(timeRunnable,0);
-                // We don't need to call mp.start because we do that fancy shit in our onPrepared listener below.
-                // MAYBE SOME OF THIS SPAGHETTI CODE IS EFFICIENT AFTER ALL.
+                // We don't need to call mp.start because we do that in our onPrepared Listener.
                 mp.prepareAsync();
             } catch (IOException e) {
             }
         }
 
         // Our onPrepared listener allows  the mediaplayer to function
-        // without having to worry about it states.
+        // without having to worry about its states.
         mp.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
             public void onPrepared(MediaPlayer mp) {
@@ -310,7 +319,6 @@ public class MainActivity extends AppCompatActivity {
                 seekBar.setMax(mp.getDuration() / 1000);
              //   toastGeneric("The Total Time for this Track is: " + mp.getDuration() / 1000 + " Seconds.");
                 mp.start();
-              //  isMPPlaying = true;
             }
         });
 
@@ -344,7 +352,7 @@ public class MainActivity extends AppCompatActivity {
                 }
 
         );
-// This is what happens when our seek bar is touched :O CRAZY SHIT DUDE I SWEAR TO GOD
+        // Our seek bars on change listener. We only utilize the onStopTrackingTouch method.
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 
 
@@ -356,8 +364,7 @@ public class MainActivity extends AppCompatActivity {
             public void onStartTrackingTouch(SeekBar seekBar) {
 
             }
-// WHERE THE TRAP MUSIC AT THO
-            // I WANT A COKE
+
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
                 if(mp != null) {
@@ -369,13 +376,11 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-// Fast forward button... Fast forwards. BUT IT ALSO USES A CDLL TO DO SO, COOL STUFF HUH?
-        // ONLY TOOK LIKE 12 HOURS OF BLOOD, TEARS, AND HIGH CHOLESTEROL TO GET IT TO WORK.
-        // FINNICKY ASS JAVA.
+        // Fast forward button Code.
         ffBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // Gotta populate our CDLL RQ, Hol' up.
+                // We populate the current song's CDLL of timestamps.
                 if (currentSong != null) {
                     currentSong.song.populateFastFoward(mp);
                     // Log.e("CURRENT MP TIME", String.valueOf(mp.getCurrentPosition()));
@@ -389,7 +394,7 @@ public class MainActivity extends AppCompatActivity {
                     // .seekToNode is our node within the song object.
                     // .data gets that number for us.
                     mp.seekTo(currentSong.song.seekToNode.data);
-                    // So these are just some logs that will let everyone know it is indeed skipping 30 secs
+                    // So these are just some logs that will let everyone know it is indeed skipping
                     // into the future.
                     Log.e("CURRENT MP TIME", String.valueOf(mp.getCurrentPosition()));
                 //    toastGeneric("The Current Time of the Song is: " + String.valueOf(mp.getCurrentPosition() / 1000) + " seconds.");
@@ -398,32 +403,32 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-// this is the loooooong click listener. press the button, it clears the fast forward CDLL and makes a new one.
+        // This is the long click listener. press the button, it clears the fast forward CDLL and makes a new one.
         // CDLLs reproduce by long clicking.
         ffBtn.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
-                // Rip byyyyyyye nodes.
+                // Delete all of the current nodes.
                 if (currentSong != null) {
                     currentSong.song.skipTimeCDLL.deleteAllNodes();
                     // Repopulate the song's CDLL
                     currentSong.song.populateFastFoward(mp);
-                    // Sett the time 30 seconds into the future
+                    // Sett the time  to where it needs to go in the future
                     // (We're assuming the user wanted to fast forward on the
                     // long press.
                     currentSong.song.fastFoward(mp);
-                    // Aww yeah you know what time it is.
+                    // Go to that point in the song
                     mp.seekTo(currentSong.song.seekToNode.data);
-                    // So apparently you have to return a boolean with
+                    // So apparently you have to return a boolean with on long click listeners.
                 } else {
                     toastGeneric("There is no song playing right now.");
                 }
-                // long click listeners. IDK why.
                 return true;
             }
 
         });
-// See above, I'm not typing it again.
+
+        // See above, I'm not typing it again.
         rewBtn.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
@@ -441,7 +446,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-// See above, I'm not typing it again.
+        // See above, I'm not typing it again.
         rewBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -549,27 +554,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-
-// OLD STOP BUTTON CODE. UNCOMMENT AND ADD START BUTTON INITIALIZER ABOVE TO REMAKE
-        // The stop button did not fit properly on the screen.
-        // Currently unused method for stop button. Ability to Play Sound Removed.
-    //    stopButton.setOnClickListener(new View.OnClickListener() {
-      //      @Override
-      //      public void onClick(View view) {
-         //       try {
-           //         if (mp.isPlaying()) {
-          ////              mp.reset();
-            //            isMPStopped = true;
-            //            nextSong = CDLList.head;
-             //       } else {
-            //        }
-
-            //    } catch (Exception e) {
-                    //      toastNothingPlaying("There is nothing playing, try selecting a file!");
-          //      }
-       //     }
-     //   });
-
 
         // Sets our button listener
         selectButton.setOnClickListener((v) -> {
