@@ -2,12 +2,14 @@
     <string name="main_name">Circle Player</string>
     <string name="second_main_name">Where Every Song is a Circle</string>
     <string name="select_file_button">Select Songs</string>
-    <string name="version">Version: 0.1.0</string>
+    <string name="version">Version: 0.2.0</string>
     <string name="inputTime">Split the Song by:</string>
     <string name="intputTimeEnd">Seconds (Up to 30).</string>
     <string name="editSongTitle">Name:</string>
     <string name="editSongArtist">Artist:</string>
+    <string name="existingArtists">Existing Artists</string>
     <string name="editSongGenre">Genre:</string>
+    <string name="presetGenres">preset Genres:</string>
     <string name="submitChanges">Save Info</string>
     <string name ="deleteBtn">Delete Song</string>
 </resources>

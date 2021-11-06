@@ -27,8 +27,10 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 public class ParseSongList extends AppCompatActivity {
 
@@ -335,7 +337,8 @@ public class ParseSongList extends AppCompatActivity {
         ArrayList<Song> allSongs = getEntries();
         if(allSongs != null) {
             ArrayList<Song> queriedSongs = new ArrayList<>();
-
+        // For loop that scans the songs' titles, artists, and genres
+            // to see if the information is contained.
             for (int i = 0; i < allSongs.size(); i++) {
                 if (allSongs.get(i).getTitle().contains(searchStr) ||
                         allSongs.get(i).getArtist().contains(searchStr) ||
@@ -351,15 +354,40 @@ public class ParseSongList extends AppCompatActivity {
             return null;
         }
     }
+
+    // Method that returns the genres and artists of existing songs. The boolean is unused
+    // but necessary to set this method apart from the other search method
+    // used to query search results.
+    public ArrayList<String> search(boolean difConst, String searchField) {
+        // We will be crosschecking allSongs and queriedResults.
+        ArrayList<Song> allSongs = getEntries();
+        ArrayList<String> queriedResults = new ArrayList<>();
+        // For loop for populating the queried results list.
+        for(int i = 0; i < allSongs.size(); i++) {
+            if(searchField.equals("genre")) {
+                queriedResults.add(allSongs.get(i).getGenre());
+            } else {
+                queriedResults.add(allSongs.get(i).getArtist());
+            }
+        }
+            // Return the correct arraylist of items we need. NO DUPLICATES
+            Set<String> tempSet = new HashSet<>(queriedResults);
+            queriedResults.clear();
+            queriedResults.addAll(tempSet);
+            return queriedResults;
+            // Else statement to return null if needed
+    }
+
     // Method deletes a single song.
     public void deleteSong(String songPath) {
-
+        // We will query all songs first.
         ArrayList<Song> allSongs = getEntries();
         boolean foundSong = false;
-
+        // Condition to check if there are any songs at all.
         if(allSongs != null) {
             Log.e("REACHED IF DELETE", "REACHED IF DELETE");
         for(int i = 0; i < allSongs.size(); i++) {
+            // Remove the song from the list if it's found.
             if (allSongs.get(i).getPath().equals(songPath)) {
                 Log.e("SONG TO DELETE FOUND", "SONG TO DELETE FOUND");
                 Log.e("Song to Delete", allSongs.get(i).getTitle());
@@ -368,13 +396,9 @@ public class ParseSongList extends AppCompatActivity {
                 foundSong = true;
             }
         }
-
-        for(int i = 0; i < allSongs.size(); i++) {
-            Log.e("Song is gone?", allSongs.get(i).getTitle());
         }
-
-        }
-
+        // Here we reset and overwrite out JSON file to reflect
+        // the song being deleted.
         if(foundSong) {
             ArrayList<Song> tempSongList = new ArrayList<>(allSongs);
             ArrayList<String> tempTitles = new ArrayList<>();
@@ -388,7 +412,8 @@ public class ParseSongList extends AppCompatActivity {
                 tempGenres.add(tempSongList.get(i).getGenre());
                 tempArtists.add(tempSongList.get(i).getArtist());
             }
-
+            // If tempPaths is empty, there's probably a problem. But we check for it
+            // so we can prevent a user end crash.
             try {
                 if(!tempPaths.isEmpty()) {
                     populateListFirstTime(tempPaths, tempTitles, tempArtists, tempGenres);

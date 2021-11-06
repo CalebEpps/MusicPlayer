@@ -138,7 +138,7 @@
         <SearchView
             android:id="@+id/searchSongs"
             android:layout_width="414dp"
-            android:layout_height="49dp" />
+            android:layout_height="75sp" />
 
     </LinearLayout>
 

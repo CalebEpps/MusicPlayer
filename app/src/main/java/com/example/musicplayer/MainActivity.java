@@ -3,7 +3,6 @@ package com.example.musicplayer;
 import static android.content.ContentValues.TAG;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
@@ -18,6 +17,7 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -26,6 +26,7 @@ import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.SearchView;
 import android.widget.SeekBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -89,6 +90,8 @@ public class MainActivity extends AppCompatActivity {
 
     // Only allows the user to choose popular audio file types.
     String[] filters = {"mp3","ogg","wav","m4a"};
+
+    String[] genres = {"Rock", "Pop", "Rap", "EDM", "Country", "Metal", "Instrumental"};
 
     // Here we declare our handler. It allows us to run things asyncronously on the same
     // or different threads.
@@ -170,6 +173,20 @@ public class MainActivity extends AppCompatActivity {
     // This is the variable for our search bar!
     SearchView searchBar;
 
+    // These variables used to be initialized in the editSongPopup method
+    // but we needed them to be usable classwide. So we initialize them in onCreate
+    // and declare them here. More info on these variable is available below.
+    View editsongView;
+    LayoutInflater inflateEdit;
+    Spinner genreSpinner;
+    ArrayAdapter<String> genreAdapter;
+    ArrayList<String> genreOptions;
+    Spinner artistSpinner;
+    ArrayAdapter<String> artistAdapter;
+    ArrayList<String> artistOptions;
+
+
+
     // onCreate Method for doing... Everything? The on create method
     // is everything that needs to happen when the app starts.
     // You'll notice it's quite large, and it's very typical for this
@@ -178,6 +195,28 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // inflateEdit and editSongView are used to create our edit song popup
+        // This is used later when the user long presses a song title.
+        inflateEdit = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
+        editsongView = inflateEdit.inflate(R.layout.edit_popup, null);
+        // We initialize these classwide variables in the onCreate method because
+        // they are not reachable in the class itself.
+        // These adapters do not require conditionals to be set because even if they
+        // are null, they are not visible to the user until the user adds songs
+        // to the playlist which makes the adapters nonnull.
+        genreSpinner = editsongView.findViewById(R.id.genreSpinner);
+        genreOptions = parser.search(true, "genre");
+        genreAdapter = new ArrayAdapter<>(this,R.layout.support_simple_spinner_dropdown_item,genreOptions);
+        genreSpinner.setAdapter(genreAdapter);
+
+        artistSpinner = editsongView.findViewById(R.id.artistSpinner);
+        artistOptions = parser.search(true,"artist");
+        artistAdapter = new ArrayAdapter<>(this,R.layout.support_simple_spinner_dropdown_item, artistOptions);
+        artistSpinner.setAdapter(artistAdapter);
+
+
+
         // We initialize our recycler view immediately
         recyclerView = findViewById(R.id.songList);
         // Next we initialize our adapter. See the Song Adapter
@@ -208,6 +247,16 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onLongItemClick(Song item) {
+                // Adapters for spinners do not dynamically update like our recycler view song adapter will. therefore, we
+                // need to reset them every time the user wants to edit a song.
+                genreOptions = parser.search(true, "genre");
+                genreAdapter = new ArrayAdapter<>(getApplicationContext(),R.layout.support_simple_spinner_dropdown_item,genreOptions);
+                genreSpinner.setAdapter(genreAdapter);
+                // Same as above
+                artistOptions = parser.search(true, "artist");
+                artistAdapter = new ArrayAdapter<>(getApplicationContext(),R.layout.support_simple_spinner_dropdown_item,artistOptions);
+                artistSpinner.setAdapter(artistAdapter);
+                // Here we open our song editor popup.
                 openSongEditor(item);
             }
         });
@@ -797,54 +846,65 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-
+    // Song Editor Popup method. Used on song item long click.
     public void openSongEditor(Song song) {
-
-        LayoutInflater inflateEdit = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
-        View editsongView = inflateEdit.inflate(R.layout.edit_popup, null);
-
+        // Get the parameters so we can set the size of our popup window.
         int width = LinearLayout.LayoutParams.WRAP_CONTENT;
         int height = LinearLayout.LayoutParams.WRAP_CONTENT;
-
+    // Create a final version of our popup window.
         final PopupWindow editSongPopup = new PopupWindow(editsongView, width, height, true);
+        // This makes the background opaque.
         editSongPopup.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-
+        // Open the popup
         editSongPopup.showAtLocation(editsongView, Gravity.CENTER,0,0);
-
+        // Button and text area initializations
         Button saveBtn= (Button) editsongView.findViewById(R.id.saveChangesBtn);
         Button deleteBtn = (Button) editsongView.findViewById(R.id.delBtn);
-
         EditText editTitleBox =  editsongView.findViewById(R.id.editTitleBox);
         EditText editArtistBox =  editsongView.findViewById(R.id.editArtistBox);
         EditText editGenreBox =  editsongView.findViewById(R.id.editGenreBox);
 
-
+        // Populate the text areas with our song info. Makes it easier to edit.
         editTitleBox.setText(song.getTitle());
         editArtistBox.setText(song.getArtist());
         editGenreBox.setText(song.getGenre());
 
-
-
+        // What happens when the delete button is pressed.
         deleteBtn.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View view) {
+                // These conditions are important because if the pointer for
+                // the next node in current song is null, the program will crash.
                 if(currentSong.next != null && currentSong != null) {
+                    // Our parser class has a method for removing the
+                    // song from the JSON file
                 parser.deleteSong(song.getPath());
+                // Reset the song arraylist
                 songArr = parser.getEntries();
+                // Resfresh the adapter for the recycler view
                 adapter.updateList(songArr);
+                // Temporary node that will help us reset our CDLL.
                 Node tempNode;
+                // Another important condition to check. The program will crash
+                    // if currentSong.next is null.
                 if(currentSong.next != null) {
                     tempNode = new Node(currentSong.next.song);
+                    // This while loop traverses the CDLL to the pointer of the
+                    // song after the one that was deleted.
                     while(!currentSong.song.getPath().equals(tempNode.song.getPath())) {
                         currentSong = currentSong.next;
 
                     }
 
                 }
+                // Here we need to repopulate the entire CDLL. This is because deleting a node
+                    // requires resetting all of the pointers. That's what happens in our
+                    // deleteAllNodes class. We refill the CDLL afterwards.
                     repopulateCDLL();
                     currentSong = CDLList.head;
                     String pathToPlay = currentSong.song.getPath();
+                    // recyclable code for resetting the media player.
                     mp.reset();
                     try {
                         mp.setDataSource(pathToPlay);
@@ -855,9 +915,11 @@ public class MainActivity extends AppCompatActivity {
                         e.printStackTrace();
                     }
                 } else {
+                    // If the playlist has no songs left, the CDLL is useless. Therefore we require
+                    // the user to keep at least one song in the playlist.
                     toastGeneric("Playlist Must Have at Least One Song!");
                 }
-
+                // We assume the user is done editing the song if they delete it, so we close the popup.
                 editSongPopup.dismiss();
             }
         });
@@ -865,35 +927,64 @@ public class MainActivity extends AppCompatActivity {
         saveBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+            // Below we need to get String variable of all of the data in the edit fields.
                 String newTitle =  editTitleBox.getText().toString();
                 String newArtist =  editArtistBox.getText().toString();
+                String newArtistDropdown = artistSpinner.getSelectedItem().toString();
+                String newGenreDropdown = genreSpinner.getSelectedItem().toString();
                 String newGenre =  editGenreBox.getText().toString();
-
-                if(newTitle.length() >= 3 && newArtist.length() >= 3 && newGenre.length() >= 3) {
+                // Initialized Below
+                String customGenre;
+                String customArtist;
+                // If the genre is not found, we will add it as a new preset genre.
+                if(genreOptions.contains(newGenre)) {
+                    customGenre = newGenreDropdown;
+                } else {
+                    customGenre = newGenre;
+                }
+                // If the artist isn't found, we will add this new artist as an existing one.
+                if(artistOptions.contains(newArtist)) {
+                    customArtist = newArtistDropdown;
+                } else {
+                    customArtist = newArtist;
+                }
+                // We require at least 3 characters in every field for the user to save the data.
+                if(newTitle.length() >= 3 && newArtist.length() >= 3 && customGenre.length() >= 3) {
+                    // Here we traverse and change the song that needs to be changed. We break if
+                    // we find that song early for optimization purposes.
                     for (int i = 0; i < songArr.size(); i++) {
                         if (songArr.get(i).getPath().equals(song.getPath())) {
                             Log.e("save Changes1", songArr.get(i).getTitle() + " "
                                                             + songArr.get(i).getGenre());
                             songArr.get(i).setTitle(newTitle);
-                            songArr.get(i).setArtist(newArtist);
-                            songArr.get(i).setGenre(newGenre);
+                            songArr.get(i).setArtist(customArtist);
+                            songArr.get(i).setGenre(customGenre);
                             Log.e("save Changes2", songArr.get(i).getTitle() + " "
                                     + songArr.get(i).getGenre());
                             break;
                         }
                     }
+                    // Try block because we are parsing and rewriting our file with
+                    // the updated song's information.
                     try {
+                        // Repopulate after change is the same as populate first time but
+                        // with more specifications in how we save the data.
                         parser.repopulateAfterChange(songArr);
                         songArr = parser.getEntries();
+                        // Update the list again.
                         adapter.updateList(songArr);
+                        // Update current song updates the song in our CDLL.
                         updateCurrentSong(song,newArtist,newTitle,newGenre);
+                        // May be able to remove this call. Untested
                         repopulateCDLL();
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
+                    // We remove the popup after the user saves their changes
                     editSongPopup.dismiss();
                 } else {
+                    // This toast appears if you try to save changes with fields
+                    // that have less than 3 characters.
                     toastGeneric("The fields need to be at least 3 characters.");
                 }
             }
