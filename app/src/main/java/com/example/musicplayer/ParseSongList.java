@@ -352,7 +352,7 @@ public class ParseSongList extends AppCompatActivity {
         }
     }
     // Method deletes a single song.
-    public void deleteSong(String songTitle) {
+    public void deleteSong(String songPath) {
 
         ArrayList<Song> allSongs = getEntries();
         boolean foundSong = false;
@@ -360,7 +360,7 @@ public class ParseSongList extends AppCompatActivity {
         if(allSongs != null) {
             Log.e("REACHED IF DELETE", "REACHED IF DELETE");
         for(int i = 0; i < allSongs.size(); i++) {
-            if (allSongs.get(i).getTitle().equals(songTitle)) {
+            if (allSongs.get(i).getPath().equals(songPath)) {
                 Log.e("SONG TO DELETE FOUND", "SONG TO DELETE FOUND");
                 Log.e("Song to Delete", allSongs.get(i).getTitle());
                 allSongs.remove(i);

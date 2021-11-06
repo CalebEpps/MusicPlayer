@@ -46,19 +46,18 @@ class CyclicDouble {
       return str + "]";
    }
 
-   public Song getSong(Song song) {
-      return song;
-   }
 
    public void deleteAllNodes() {
       if(head != null) {
          Node temp;
          Node currentNode = head.next;
 
-         while(currentNode != head) {
-            temp = currentNode.next;
-            currentNode = null;
-            currentNode = temp;
+         if(currentNode != null) {
+            while (currentNode != head) {
+               temp = currentNode.next;
+               currentNode = null;
+               currentNode = temp;
+            }
          }
          head = null;
 

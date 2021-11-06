@@ -829,23 +829,23 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View view) {
-                if(currentSong.next != null) {
-                parser.deleteSong(song.getTitle());
+                if(currentSong.next != null && currentSong != null) {
+                parser.deleteSong(song.getPath());
                 songArr = parser.getEntries();
                 adapter.updateList(songArr);
                 Node tempNode;
-
+                mp.reset();
+                if(currentSong.next != null) {
                     tempNode = new Node(currentSong.next.song);
-                    repopulateCDLL();
-                    String pathToPlay = currentSong.song.getPath();
-
-                    currentSong = CDLList.head;
-
                     while(!currentSong.song.getPath().equals(tempNode.song.getPath())) {
                         currentSong = currentSong.next;
 
                     }
-                    mp.reset();
+
+                }
+                    repopulateCDLL();
+                    String pathToPlay = currentSong.song.getPath();
+                    currentSong = CDLList.head;
                     try {
                         mp.setDataSource(pathToPlay);
                         mp.prepareAsync();
