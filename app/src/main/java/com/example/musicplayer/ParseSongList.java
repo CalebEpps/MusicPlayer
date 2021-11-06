@@ -91,6 +91,72 @@ public class ParseSongList extends AppCompatActivity {
         }
     }
 
+    public void repopulateAfterChange(ArrayList<Song> songArr) throws IOException {
+        ArrayList<String> tempTitles = new ArrayList<>();
+        ArrayList<String> tempPaths = new ArrayList<>();
+        ArrayList<String> tempGenres = new ArrayList<>();
+        ArrayList<String> tempArtists = new ArrayList<>();
+
+        for(int i = 0; i < songArr.size(); i++) {
+            tempTitles.add(songArr.get(i).getTitle());
+            tempPaths.add(songArr.get(i).getPath());
+            tempGenres.add(songArr.get(i).getGenre());
+            tempArtists.add(songArr.get(i).getArtist());
+        }
+
+
+
+        // Initialize Jsonarray and populate it with the parameters in the method's signature.
+        JSONArray jsonArray = new JSONArray();
+        for (int i = 0; i < songArr.size(); i++) {
+            // Temp JSON Object to hold our data
+            JSONObject newEntry = new JSONObject();
+            newEntry.put("songTitle",  tempTitles.get(i));
+            newEntry.put("songPath",  tempPaths.get(i));
+            newEntry.put("artist", tempArtists.get(i));
+            newEntry.put("genre", tempGenres.get(i));
+            // Put newEntry into our jsonarray
+            jsonArray.add(newEntry);
+            Log.e("REPOP TEST", newEntry.get("genre") + " " + newEntry.get("songTitle"));
+
+        }
+        // If API version is > 30, we need to write to docs folder, NOT our own.
+        if (SDK_INT >= Build.VERSION_CODES.Q) {
+            filePathEnd = "/Documents";
+        } else {
+            filePathEnd = "/WGACA";
+
+        }
+        // IF API version is higher than 30, we need to NOT create our folder. If it is lower than 30,
+        // we can create one.
+        if (SDK_INT >= Build.VERSION_CODES.Q) {
+            File directoryToCreate = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).getPath());
+            //directoryToCreate.mkdirs();
+            // Initialize our JSON file and output stream. This will allow us to write to our file.
+            File initJSONFile = new File(directoryToCreate.getPath());
+            FileOutputStream outputStream = new FileOutputStream(initJSONFile + "/songs.json");
+            byte[] strToBytes = jsonArray.toString().getBytes("utf-8");
+            // Here we just write the bytes of our jsonarray to our output file.
+            outputStream.write(strToBytes);
+            // Close the output file. :)
+            outputStream.close();
+        } else {
+            File directoryToCreate = new File(Environment.getExternalStorageDirectory(), filePathEnd);
+            directoryToCreate.mkdirs();
+            // Initialize our JSON file and output stream. This will allow us to write to our file.
+            File initJSONFile = new File(Environment.getExternalStorageDirectory(), filePathEnd);
+            FileOutputStream outputStream = new FileOutputStream(initJSONFile + "/songs.json");
+            byte[] strToBytes = jsonArray.toString().getBytes("utf-8");
+            // Here we just write the bytes of our jsonarray to our output file.
+            outputStream.write(strToBytes);
+            // Close the output file. :)
+            outputStream.close();
+
+        }
+    }
+
+
+
     // This method is run if the file 'songs.json' already exists in our user's directory.
     public void populateExistingList(ArrayList paths, ArrayList names, ArrayList artists, ArrayList genres) {
 

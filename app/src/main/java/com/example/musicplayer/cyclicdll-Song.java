@@ -10,28 +10,24 @@ class CyclicDouble {
    //initially head is set to null
    Node head = null;
    private final String TAG = "Traverse";
-   
-   public void insertNode(Song song){
-      
-      if(head == null){
+
+   public void insertNode(Song song) {
+
+      if (head == null) {
          head = new Node(song);
-      }
-      
-      else if(head.next == null){
+      } else if (head.next == null) {
          Node node = new Node(song, head, head);
          head.next = head.previous = node;
-         
-      }
-      
-      else{
+
+      } else {
          Node node = new Node(song, head, head.previous);
          Node temp = head.previous;
          temp.next = node;
          head.previous = node;
-                  
+
       }
    }
-   
+
    public String toString() {
       if (head == null)
          return "[]";
@@ -41,19 +37,35 @@ class CyclicDouble {
       String str = "[";
       Node current = head;
 
-      do{
+      do {
          str += current.song.getTitle() + ", ";
          current = current.next;
       }
       while (current != head);
-        
+
       return str + "]";
    }
 
    public Song getSong(Song song) {
       return song;
    }
-      
+
+   public void deleteAllNodes() {
+      if(head != null) {
+         Node temp;
+         Node currentNode = head.next;
+
+         while(currentNode != head) {
+            temp = currentNode.next;
+            currentNode = null;
+            currentNode = temp;
+         }
+         head = null;
+
+      }
+   }
+
+
 }
 
    class Node {
@@ -70,5 +82,9 @@ class CyclicDouble {
       this.song = song;
       this.next = next;
       this.previous = previous;
+   }
+
+   public Node() {
+
    }
 }

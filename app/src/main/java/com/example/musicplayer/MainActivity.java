@@ -3,19 +3,27 @@ package com.example.musicplayer;
 import static android.content.ContentValues.TAG;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.SearchView;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -90,6 +98,7 @@ public class MainActivity extends AppCompatActivity {
     ImageView adBanner;
     // Classwide current time variable. Can be changed throughout the activity.
     TextView currentTimePlaying;
+    TextView songTitle;
     // The seekbar is the bar you can see the song's current time on.
     SeekBar seekBar;
 
@@ -177,15 +186,15 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(Song clickedSong) {
                 // Test Logs Pre-Traversal of CDLL
-                Log.e("CDLL Test1", currentSong.song.getTitle());
-                Log.e("CDLL Test2", clickedSong.getTitle());
+                Log.e("CDLL Test1", currentSong.song.getPath());
+                Log.e("CDLL Test2", clickedSong.getPath());
                 // Compare the current song's title to the song that was clicked.
-                while(!currentSong.song.getTitle().equals(clickedSong.getTitle())) {
+                while(!currentSong.song.getPath().equals(clickedSong.getPath())) {
                         currentSong = currentSong.next;
 
                 }
                 // Test Log Post Traversal
-                Log.e("CDLL Test", currentSong.song.getTitle());
+                Log.e("CDLL Test", currentSong.song.getPath());
                 // Reset and run our media player
                 try {
                     mp.reset();
@@ -195,11 +204,16 @@ public class MainActivity extends AppCompatActivity {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+
+                openSongEditor(clickedSong);
+
+
+
                 }
         });
 
         // The song title and the currently playing text references.
-        TextView songTitle = findViewById(R.id.songTitle);
+        songTitle = findViewById(R.id.songTitle);
         TextView currentlyPlayingText = findViewById(R.id.textView2);
 
         // Allowing the user to rotate their phone resets the activity, and we don't want that.
@@ -684,9 +698,9 @@ public class MainActivity extends AppCompatActivity {
 
                     // This code will parse our JSON file and reset the recycler view to include all of our added songs.
                     ArrayList<Song> getAllSongsAfter = parser.getEntries();
-                    RecyclerView recyclerView = (RecyclerView) findViewById(R.id.songList);
+                    recyclerView.setHasFixedSize(false);
+                    recyclerView.setLayoutManager(new LinearLayoutManager(this));
                     adapter.updateList(getAllSongsAfter);
-                 //   recyclerView.setAdapter(adapter);
 
 
 
@@ -705,7 +719,7 @@ public class MainActivity extends AppCompatActivity {
                             recyclerView.setHasFixedSize(false);
                             recyclerView.setLayoutManager(new LinearLayoutManager(this));
                             adapter.updateList(songArr);
-                        //    recyclerView.setAdapter(adapter);
+                            recyclerView.setAdapter(adapter);
                         } else {
                             // This prolly means something went wrong RIP :(
                             // You should NOT hit this else block, it's here for reference
@@ -785,6 +799,132 @@ public class MainActivity extends AppCompatActivity {
                 toastGeneric("Why don't you trust us, this is a school project. :(");
             }
         }
+    }
+
+    public void openSongEditor(Song song) {
+
+        LayoutInflater inflateEdit = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
+        View editsongView = inflateEdit.inflate(R.layout.edit_popup, null);
+
+        int width = LinearLayout.LayoutParams.WRAP_CONTENT;
+        int height = LinearLayout.LayoutParams.WRAP_CONTENT;
+
+        final PopupWindow editSongPopup = new PopupWindow(editsongView, width, height, true);
+        editSongPopup.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+        editSongPopup.showAtLocation(editsongView, Gravity.CENTER,0,0);
+
+        Button saveBtn= (Button) editsongView.findViewById(R.id.saveChangesBtn);
+        Button deleteBtn = (Button) editsongView.findViewById(R.id.delBtn);
+
+        EditText editTitleBox =  editsongView.findViewById(R.id.editTitleBox);
+        EditText editArtistBox =  editsongView.findViewById(R.id.editArtistBox);
+        EditText editGenreBox =  editsongView.findViewById(R.id.editGenreBox);
+
+
+        editTitleBox.setText(song.getTitle());
+        editArtistBox.setText(song.getArtist());
+        editGenreBox.setText(song.getGenre());
+
+
+
+        deleteBtn.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View view) {
+                if(currentSong.next != null) {
+                parser.deleteSong(song.getTitle());
+                songArr = parser.getEntries();
+                adapter.updateList(songArr);
+                Node tempNode = new Node(currentSong.song);
+
+                    tempNode = new Node(currentSong.next.song);
+                    repopulateCDLL();
+                    String pathToPlay = currentSong.song.getPath();
+
+                    currentSong = CDLList.head;
+
+                    while(!currentSong.song.getTitle().equals(tempNode.song.getTitle())) {
+                        currentSong = currentSong.next;
+
+                    }
+                    mp.reset();
+                    try {
+                        mp.setDataSource(pathToPlay);
+                        mp.prepareAsync();
+                        handler.removeCallbacks(timeRunnable);
+                        handler.postDelayed(timeRunnable,0);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    toastGeneric("Playlist Must Have at Least One Song!");
+                }
+
+                editSongPopup.dismiss();
+            }
+        });
+
+        saveBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                String newTitle =  editTitleBox.getText().toString();
+                String newArtist =  editArtistBox.getText().toString();
+                String newGenre =  editGenreBox.getText().toString();
+
+                if(newTitle.length() >= 3 && newArtist.length() >= 3 && newGenre.length() >= 3) {
+                    for (int i = 0; i < songArr.size(); i++) {
+                        if (songArr.get(i).getPath().equals(song.getPath())) {
+                            Log.e("save Changes1", songArr.get(i).getTitle() + " "
+                                                            + songArr.get(i).getGenre());
+                            songArr.get(i).setTitle(newTitle);
+                            songArr.get(i).setArtist(newArtist);
+                            songArr.get(i).setGenre(newGenre);
+                            Log.e("save Changes2", songArr.get(i).getTitle() + " "
+                                    + songArr.get(i).getGenre());
+                            break;
+                        }
+                    }
+                    try {
+                        parser.repopulateAfterChange(songArr);
+                        songArr = parser.getEntries();
+                        adapter.updateList(songArr);
+                        updateCurrentSong(song,newArtist,newTitle,newGenre);
+                        repopulateCDLL();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    editSongPopup.dismiss();
+                } else {
+                    toastGeneric("The fields need to be at least 3 characters.");
+                }
+            }
+        });
+
+
+    }
+
+    public void repopulateCDLL() {
+        CDLList.deleteAllNodes();
+        for (Song song : songArr) {
+            CDLList.insertNode(song);
+        }
+    }
+
+    public void updateCurrentSong(Song song, String newArtist, String newTitle, String newGenre) {
+        String tempPath = currentSong.song.getPath();
+        while(!currentSong.song.getPath().equals(song.getPath())) {
+            currentSong = currentSong.next;
+        }
+        currentSong.song.setArtist(newArtist);
+        currentSong.song.setTitle(newTitle);
+        currentSong.song.setGenre(newGenre);
+
+        while(!currentSong.song.getPath().equals(tempPath)) {
+            currentSong = currentSong.next;
+        }
+        songTitle.setText(currentSong.song.getTitle());
     }
 
 }

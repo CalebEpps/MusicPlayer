@@ -9,4 +9,5 @@
     <string name="editSongArtist">Artist:</string>
     <string name="editSongGenre">Genre:</string>
     <string name="submitChanges">Save Changes</string>
+    <string name ="deleteBtn"> Delete Song</string>
 </resources>
