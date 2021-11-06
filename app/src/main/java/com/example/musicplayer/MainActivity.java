@@ -681,26 +681,23 @@ public class MainActivity extends AppCompatActivity {
                             }
 
                         }
-                        // If that song already exists in our file, we don't add it.
-                        // Otherwise, we add it to our CDLL.
-                        if (!alreadyExists) {
-                            Log.e("ALREADY EXISTS?: ", "FALSE");
-                            CDLList.insertNode(new Song(titles.get(i), paths.get(i)));
-                        }
-                        // Here we need to reset the boolean variable after the inner loop
-                        // has run so we can check the next song.
-                        alreadyExists = false;
-
-
                     }
 
                     //    Log.e("CDLL POPULATED:",CDLList.head.song.getTitle());
 
                     // This code will parse our JSON file and reset the recycler view to include all of our added songs.
-                    ArrayList<Song> getAllSongsAfter = parser.getEntries();
+                    songArr = parser.getEntries();
                     recyclerView.setHasFixedSize(false);
                     recyclerView.setLayoutManager(new LinearLayoutManager(this));
-                    adapter.updateList(getAllSongsAfter);
+                    Node tempNode;
+
+                    tempNode = new Node(currentSong.song);
+                    repopulateCDLL();
+                    currentSong = CDLList.head;
+                    while(!currentSong.song.getPath().equals(tempNode.song.getPath())) {
+                        currentSong = currentSong.next;
+                    }
+                    adapter.updateList(songArr);
 
 
 
@@ -836,7 +833,7 @@ public class MainActivity extends AppCompatActivity {
                 parser.deleteSong(song.getTitle());
                 songArr = parser.getEntries();
                 adapter.updateList(songArr);
-                Node tempNode = new Node(currentSong.song);
+                Node tempNode;
 
                     tempNode = new Node(currentSong.next.song);
                     repopulateCDLL();
@@ -844,7 +841,7 @@ public class MainActivity extends AppCompatActivity {
 
                     currentSong = CDLList.head;
 
-                    while(!currentSong.song.getTitle().equals(tempNode.song.getTitle())) {
+                    while(!currentSong.song.getPath().equals(tempNode.song.getPath())) {
                         currentSong = currentSong.next;
 
                     }
@@ -926,7 +923,6 @@ public class MainActivity extends AppCompatActivity {
         }
         songTitle.setText(currentSong.song.getTitle());
     }
-
 }
 
 
