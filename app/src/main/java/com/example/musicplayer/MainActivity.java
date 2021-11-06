@@ -834,7 +834,6 @@ public class MainActivity extends AppCompatActivity {
                 songArr = parser.getEntries();
                 adapter.updateList(songArr);
                 Node tempNode;
-                mp.reset();
                 if(currentSong.next != null) {
                     tempNode = new Node(currentSong.next.song);
                     while(!currentSong.song.getPath().equals(tempNode.song.getPath())) {
@@ -844,8 +843,9 @@ public class MainActivity extends AppCompatActivity {
 
                 }
                     repopulateCDLL();
-                    String pathToPlay = currentSong.song.getPath();
                     currentSong = CDLList.head;
+                    String pathToPlay = currentSong.song.getPath();
+                    mp.reset();
                     try {
                         mp.setDataSource(pathToPlay);
                         mp.prepareAsync();
