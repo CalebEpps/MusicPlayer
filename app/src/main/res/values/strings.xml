@@ -4,10 +4,10 @@
     <string name="select_file_button">Select Songs</string>
     <string name="version">Version: 0.1.0</string>
     <string name="inputTime">Split the Song by:</string>
-    <string name="intputTimeEnd"> Seconds (Up to 30).</string>
+    <string name="intputTimeEnd">Seconds (Up to 30).</string>
     <string name="editSongTitle">Name:</string>
     <string name="editSongArtist">Artist:</string>
     <string name="editSongGenre">Genre:</string>
-    <string name="submitChanges">Save Changes</string>
-    <string name ="deleteBtn"> Delete Song</string>
+    <string name="submitChanges">Save Info</string>
+    <string name ="deleteBtn">Delete Song</string>
 </resources>

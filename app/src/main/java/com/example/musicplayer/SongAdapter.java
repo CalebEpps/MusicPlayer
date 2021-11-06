@@ -65,7 +65,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
         }
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
         public TextView songTitle;
         public ConstraintLayout constraintLayout;
         public ViewHolder(View itemView) {
@@ -83,16 +83,32 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
                     listener.onItemClick(song);
                 }
             });
+
+            itemView.setOnLongClickListener(new View.OnLongClickListener() {
+
+                @Override
+                public boolean onLongClick(View view) {
+                    song.placeInList = getAdapterPosition();
+                    listener.onLongItemClick(song);
+                    return true;
+                }
+            });
         }
 
         @Override
         public void onClick(View view) {
 
         }
+
+        @Override
+        public boolean onLongClick(View view) {
+            return true;
+        }
     }
 
     public interface OnItemClickListener {
         void onItemClick(Song item);
+        void onLongItemClick(Song item);
     }
 
     public void updateList(ArrayList<Song> list){

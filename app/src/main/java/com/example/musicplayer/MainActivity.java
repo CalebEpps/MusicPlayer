@@ -186,15 +186,15 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(Song clickedSong) {
                 // Test Logs Pre-Traversal of CDLL
-                Log.e("CDLL Test1", currentSong.song.getPath());
-                Log.e("CDLL Test2", clickedSong.getPath());
+               // Log.e("CDLL Test1", currentSong.song.getPath());
+               // Log.e("CDLL Test2", clickedSong.getPath());
                 // Compare the current song's title to the song that was clicked.
                 while(!currentSong.song.getPath().equals(clickedSong.getPath())) {
                         currentSong = currentSong.next;
 
                 }
                 // Test Log Post Traversal
-                Log.e("CDLL Test", currentSong.song.getPath());
+                //Log.e("CDLL Test", currentSong.song.getPath());
                 // Reset and run our media player
                 try {
                     mp.reset();
@@ -204,12 +204,12 @@ public class MainActivity extends AppCompatActivity {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+            }
 
-                openSongEditor(clickedSong);
-
-
-
-                }
+            @Override
+            public void onLongItemClick(Song item) {
+                openSongEditor(item);
+            }
         });
 
         // The song title and the currently playing text references.
