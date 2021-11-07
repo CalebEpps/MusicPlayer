@@ -17,6 +17,7 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -60,6 +61,9 @@ public class MainActivity extends AppCompatActivity {
     MediaPlayer mp = new MediaPlayer();
 
     Toast toast;
+
+    boolean genreSpinnerInitialized;
+    boolean artistSpinnerInitialized;
 
     // Boolean for mediaplayer, currently not used due to no ability to play music (Removed for testing)
     boolean isMPStopped = false;
@@ -855,8 +859,6 @@ public class MainActivity extends AppCompatActivity {
         final PopupWindow editSongPopup = new PopupWindow(editsongView, width, height, true);
         // This makes the background opaque.
         editSongPopup.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        // Open the popup
-        editSongPopup.showAtLocation(editsongView, Gravity.CENTER,0,0);
         // Button and text area initializations
         Button saveBtn= (Button) editsongView.findViewById(R.id.saveChangesBtn);
         Button deleteBtn = (Button) editsongView.findViewById(R.id.delBtn);
@@ -868,6 +870,43 @@ public class MainActivity extends AppCompatActivity {
         editTitleBox.setText(song.getTitle());
         editArtistBox.setText(song.getArtist());
         editGenreBox.setText(song.getGenre());
+
+        // Open the popup
+        editSongPopup.showAtLocation(editsongView, Gravity.CENTER,0,0);
+
+
+        genreSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                if(!genreSpinnerInitialized) {
+                    genreSpinnerInitialized = true;
+                    return;
+                }
+                editGenreBox.setText(genreOptions.get(i));
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+                editGenreBox.setText(song.getGenre());
+            }
+        });
+
+        artistSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                if(!artistSpinnerInitialized) {
+                    artistSpinnerInitialized = true;
+                    return;
+                }
+                editArtistBox.setText(artistOptions.get(i));
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+                editArtistBox.setText(song.getArtist());
+            }
+        });
+
 
         // What happens when the delete button is pressed.
         deleteBtn.setOnClickListener(new View.OnClickListener() {
@@ -927,29 +966,20 @@ public class MainActivity extends AppCompatActivity {
         saveBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-            // Below we need to get String variable of all of the data in the edit fields.
+
+                genreSpinnerInitialized = false;
+                artistSpinnerInitialized = false;
+
+                // Below we need to get String variable of all of the data in the edit fields.
                 String newTitle =  editTitleBox.getText().toString();
                 String newArtist =  editArtistBox.getText().toString();
                 String newArtistDropdown = artistSpinner.getSelectedItem().toString();
-                String newGenreDropdown = genreSpinner.getSelectedItem().toString();
                 String newGenre =  editGenreBox.getText().toString();
-                // Initialized Below
-                String customGenre;
-                String customArtist;
-                // If the genre is not found, we will add it as a new preset genre.
-                if(genreOptions.contains(newGenre)) {
-                    customGenre = newGenreDropdown;
-                } else {
-                    customGenre = newGenre;
-                }
-                // If the artist isn't found, we will add this new artist as an existing one.
-                if(artistOptions.contains(newArtist)) {
-                    customArtist = newArtistDropdown;
-                } else {
-                    customArtist = newArtist;
-                }
+
+
+
                 // We require at least 3 characters in every field for the user to save the data.
-                if(newTitle.length() >= 3 && newArtist.length() >= 3 && customGenre.length() >= 3) {
+                if(newTitle.length() >= 3 && newArtist.length() >= 3 && newGenre.length() >= 3) {
                     // Here we traverse and change the song that needs to be changed. We break if
                     // we find that song early for optimization purposes.
                     for (int i = 0; i < songArr.size(); i++) {
@@ -957,8 +987,8 @@ public class MainActivity extends AppCompatActivity {
                             Log.e("save Changes1", songArr.get(i).getTitle() + " "
                                                             + songArr.get(i).getGenre());
                             songArr.get(i).setTitle(newTitle);
-                            songArr.get(i).setArtist(customArtist);
-                            songArr.get(i).setGenre(customGenre);
+                            songArr.get(i).setArtist(newArtist);
+                            songArr.get(i).setGenre(newGenre);
                             Log.e("save Changes2", songArr.get(i).getTitle() + " "
                                     + songArr.get(i).getGenre());
                             break;
@@ -989,6 +1019,13 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+
+
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
 
 
     }
