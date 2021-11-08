@@ -42,12 +42,20 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-
+// Unicorn File Picker is a third party library we utilize for file selection.
 import abhishekti7.unicorn.filepicker.UnicornFilePicker;
 import abhishekti7.unicorn.filepicker.utils.Constants;
 
 /*
-
+    Class MainActivity
+        **Override**
+        void OnCreate - Runs on App Startup. Contains interface setup, listener setup, and more.
+        void toastGeneric(text to show) - displays a popup msg to the user containing the text to show variable.
+        void permissionCheck(permission type, return code) - Dynamic method for checking permissions
+        void onRequestPermissionResult(int reqCode, String[] permissions, int[] grantResults) - Takes results from permissions check and ensures we have permissions needed
+        void openSongEditor - method that initializes and displays the song popup to the user.
+        void repopulateCDLL - General purpose method that clears and re initializes the circular doubly linked list if needed.
+        void updateCurrentSong - Traverses the current circular doubly linked list in order to find the next song needed if one is deleted.
 
  */
 
@@ -204,20 +212,25 @@ public class MainActivity extends AppCompatActivity {
         // This is used later when the user long presses a song title.
         inflateEdit = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
         editsongView = inflateEdit.inflate(R.layout.edit_popup, null);
+        songArr = parser.getEntries();
         // We initialize these classwide variables in the onCreate method because
         // they are not reachable in the class itself.
         // These adapters do not require conditionals to be set because even if they
         // are null, they are not visible to the user until the user adds songs
         // to the playlist which makes the adapters nonnull.
         genreSpinner = editsongView.findViewById(R.id.genreSpinner);
-        genreOptions = parser.search(true, "genre");
-        genreAdapter = new ArrayAdapter<>(this,R.layout.support_simple_spinner_dropdown_item,genreOptions);
-        genreSpinner.setAdapter(genreAdapter);
-
         artistSpinner = editsongView.findViewById(R.id.artistSpinner);
-        artistOptions = parser.search(true,"artist");
-        artistAdapter = new ArrayAdapter<>(this,R.layout.support_simple_spinner_dropdown_item, artistOptions);
-        artistSpinner.setAdapter(artistAdapter);
+        if(songArr != null) {
+            genreOptions = parser.search(true, "genre");
+            genreAdapter = new ArrayAdapter<>(this,R.layout.support_simple_spinner_dropdown_item,genreOptions);
+            genreSpinner.setAdapter(genreAdapter);
+
+            artistSpinner = editsongView.findViewById(R.id.artistSpinner);
+            artistOptions = parser.search(true,"artist");
+            artistAdapter = new ArrayAdapter<>(this,R.layout.support_simple_spinner_dropdown_item, artistOptions);
+            artistSpinner.setAdapter(artistAdapter);
+        }
+
 
 
 
@@ -762,6 +775,9 @@ public class MainActivity extends AppCompatActivity {
                         Log.e("ITEMS: ", String.valueOf(parser.getLength()));
                         Log.e("POPULATELISTSUCCESS", "FILES ADDED TO JSON FILE SUCCESSFULLY (FIRST TIME RUN)");
 
+                        genreOptions = parser.search(true, "genre");
+                        artistOptions = parser.search(true,"artist");
+
                         // This will populate and initialize our recycleview our FIRST ENTRIES once they've been added.
                         songArr = parser.getEntries();
                         if (songArr != null) {
@@ -883,6 +899,7 @@ public class MainActivity extends AppCompatActivity {
                     return;
                 }
                 editGenreBox.setText(genreOptions.get(i));
+
             }
 
             @Override
@@ -899,6 +916,7 @@ public class MainActivity extends AppCompatActivity {
                     return;
                 }
                 editArtistBox.setText(artistOptions.get(i));
+
             }
 
             @Override
@@ -907,6 +925,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        genreSpinnerInitialized = false;
+        artistSpinnerInitialized = false;
 
         // What happens when the delete button is pressed.
         deleteBtn.setOnClickListener(new View.OnClickListener() {
@@ -1019,13 +1039,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-
-
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
 
 
     }
