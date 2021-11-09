@@ -10,7 +10,6 @@
     <uses-feature android:name="android.hardware.screen.portrait" />
 
     <application
-        android:windowSoftInputMode="adjustPan"
         android:allowBackup="true"
         android:icon="@mipmap/app_icon"
         android:label="@string/main_name"
@@ -22,7 +21,8 @@
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan"/>
         <activity
             android:name=".SplashScreen"
             android:exported="true">
