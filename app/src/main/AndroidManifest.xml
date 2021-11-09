@@ -10,6 +10,7 @@
     <uses-feature android:name="android.hardware.screen.portrait" />
 
     <application
+        android:windowSoftInputMode="adjustPan"
         android:allowBackup="true"
         android:icon="@mipmap/app_icon"
         android:label="@string/main_name"

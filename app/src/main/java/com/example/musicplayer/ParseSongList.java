@@ -371,7 +371,21 @@ public class ParseSongList extends AppCompatActivity {
             }
         }
             // Return the correct arraylist of items we need. NO DUPLICATES
+        if(searchField.equals("genre")) {
+            queriedResults.add("Rock");
+            queriedResults.add("Pop");
+            queriedResults.add("Rap");
+            queriedResults.add("Metal");
+        } else {
+            queriedResults.add("Unknown Artist");
+            queriedResults.add("Various Artists");
+        }
             Set<String> tempSet = new HashSet<>(queriedResults);
+            if(searchField.equals("artist")) {
+                tempSet.remove("No Artist Found");
+                tempSet.remove("No Artist Assigned");
+            }
+
             queriedResults.clear();
             queriedResults.addAll(tempSet);
             return queriedResults;
