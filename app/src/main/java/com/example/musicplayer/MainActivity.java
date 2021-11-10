@@ -103,8 +103,6 @@ public class MainActivity extends AppCompatActivity {
     // Only allows the user to choose popular audio file types.
     String[] filters = {"mp3","ogg","wav","m4a"};
 
-    String[] genres = {"Rock", "Pop", "Rap", "EDM", "Country", "Metal", "Instrumental"};
-
     // Here we declare our handler. It allows us to run things asyncronously on the same
     // or different threads.
     Handler handler = new Handler();
