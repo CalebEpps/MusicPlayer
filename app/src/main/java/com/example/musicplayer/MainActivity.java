@@ -650,7 +650,7 @@ public class MainActivity extends AppCompatActivity {
                     .showHiddenFiles(false)
                     .addItemDivider(true)
                     .setFilters(filters)
-                    .theme(R.style.UnicornFilePicker_Default)
+                    .theme(R.style.UnicornFilePicker_Dracula)
                     .build()
                     .forResult(Constants.REQ_UNICORN_FILE);
         });

@@ -9,4 +9,5 @@
     <color name="white">#FFFFFFFF</color>
     <color name="pastel">#D2C7D5</color>
     <color name="darkpastel">#443E45</color>
+    <color name="spotifyGreen">#00F405</color>
 </resources>
