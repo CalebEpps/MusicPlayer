@@ -8,13 +8,15 @@
         <entry key="..\:/Users/caleb/AndroidStudioProjects/MusicPlayer/app/src/main/res/drawable/app_icon_background.xml" value="0.2765625" />
         <entry key="..\:/Users/caleb/AndroidStudioProjects/MusicPlayer/app/src/main/res/drawable/ic_launcher_background.xml" value="0.159375" />
         <entry key="..\:/Users/caleb/AndroidStudioProjects/MusicPlayer/app/src/main/res/drawable/ttt_logo_background.xml" value="0.3390625" />
-        <entry key="..\:/Users/caleb/AndroidStudioProjects/MusicPlayer/app/src/main/res/layout/activity_main.xml" value="0.22" />
+        <entry key="..\:/Users/caleb/AndroidStudioProjects/MusicPlayer/app/src/main/res/layout/activity_main.xml" value="0.25" />
         <entry key="..\:/Users/caleb/AndroidStudioProjects/MusicPlayer/app/src/main/res/layout/activity_splash_screen.xml" value="0.3229166666666667" />
+        <entry key="..\:/Users/caleb/AndroidStudioProjects/MusicPlayer/app/src/main/res/layout/activity_view_song_acitivty.xml" value="0.43931159420289856" />
         <entry key="..\:/Users/caleb/AndroidStudioProjects/MusicPlayer/app/src/main/res/layout/edit_popup.xml" value="0.33" />
         <entry key="..\:/Users/caleb/AndroidStudioProjects/MusicPlayer/app/src/main/res/layout/fragment_blank_test.xml" value="0.38697916666666665" />
         <entry key="..\:/Users/caleb/AndroidStudioProjects/MusicPlayer/app/src/main/res/layout/fragment_song_edit.xml" value="0.9" />
         <entry key="..\:/Users/caleb/AndroidStudioProjects/MusicPlayer/app/src/main/res/layout/song_item.xml" value="0.33" />
         <entry key="..\:/Users/caleb/AndroidStudioProjects/MusicPlayer/app/src/main/res/layout/splash_layout.xml" value="0.3229166666666667" />
+        <entry key="..\:/Users/caleb/AndroidStudioProjects/MusicPlayer/app/src/main/res/layout/tutorial_popup.xml" value="0.4219409282700422" />
         <entry key="..\:/Users/caleb/AndroidStudioProjects/MusicPlayer/app/src/main/res/mipmap-anydpi-v26/app-icon_round.xml" value="0.3421875" />
         <entry key="..\:/Users/caleb/AndroidStudioProjects/MusicPlayer/app/src/main/res/mipmap-anydpi-v26/app_icon.xml" value="0.2765625" />
         <entry key="..\:/Users/caleb/AndroidStudioProjects/MusicPlayer/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.159375" />
