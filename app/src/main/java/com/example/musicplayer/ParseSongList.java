@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.lang.reflect.Array;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -73,7 +74,7 @@ public class ParseSongList extends AppCompatActivity {
             // Initialize our JSON file and output stream. This will allow us to write to our file.
             File initJSONFile = new File(directoryToCreate.getPath());
             FileOutputStream outputStream = new FileOutputStream(initJSONFile + "/songs.json");
-            byte[] strToBytes = jsonArray.toString().getBytes("utf-8");
+            byte[] strToBytes = jsonArray.toString().getBytes(StandardCharsets.UTF_8);
             // Here we just write the bytes of our jsonarray to our output file.
             outputStream.write(strToBytes);
             // Close the output file. :)
@@ -84,7 +85,7 @@ public class ParseSongList extends AppCompatActivity {
             // Initialize our JSON file and output stream. This will allow us to write to our file.
             File initJSONFile = new File(Environment.getExternalStorageDirectory(), filePathEnd);
             FileOutputStream outputStream = new FileOutputStream(initJSONFile + "/songs.json");
-            byte[] strToBytes = jsonArray.toString().getBytes("utf-8");
+            byte[] strToBytes = jsonArray.toString().getBytes(StandardCharsets.UTF_8);
             // Here we just write the bytes of our jsonarray to our output file.
             outputStream.write(strToBytes);
             // Close the output file. :)
@@ -137,7 +138,7 @@ public class ParseSongList extends AppCompatActivity {
             // Initialize our JSON file and output stream. This will allow us to write to our file.
             File initJSONFile = new File(directoryToCreate.getPath());
             FileOutputStream outputStream = new FileOutputStream(initJSONFile + "/songs.json");
-            byte[] strToBytes = jsonArray.toString().getBytes("utf-8");
+            byte[] strToBytes = jsonArray.toString().getBytes(StandardCharsets.UTF_8);
             // Here we just write the bytes of our jsonarray to our output file.
             outputStream.write(strToBytes);
             // Close the output file. :)
@@ -148,7 +149,7 @@ public class ParseSongList extends AppCompatActivity {
             // Initialize our JSON file and output stream. This will allow us to write to our file.
             File initJSONFile = new File(Environment.getExternalStorageDirectory(), filePathEnd);
             FileOutputStream outputStream = new FileOutputStream(initJSONFile + "/songs.json");
-            byte[] strToBytes = jsonArray.toString().getBytes("utf-8");
+            byte[] strToBytes = jsonArray.toString().getBytes(StandardCharsets.UTF_8);
             // Here we just write the bytes of our jsonarray to our output file.
             outputStream.write(strToBytes);
             // Close the output file. :)
@@ -219,7 +220,7 @@ public class ParseSongList extends AppCompatActivity {
             // before writing it to the file.
             File initJSONFile = new File(Environment.getExternalStorageDirectory(), filePathEnd);
             FileOutputStream outputStream = new FileOutputStream(initJSONFile + "/songs.json");
-            byte[] strToBytes = jsonArray.toString().getBytes("utf-8");
+            byte[] strToBytes = jsonArray.toString().getBytes(StandardCharsets.UTF_8);
             // Here we just write the bytes of our jsonarray to our output file.
             outputStream.write(strToBytes);
             // Close the output file. :)

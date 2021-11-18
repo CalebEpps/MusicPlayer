@@ -13,14 +13,14 @@
     <string name="submitChanges">Save Info</string>
     <string name ="deleteBtn">Delete Song</string>
     <string name="tutWelcome">Welcome to Circle Player!</string>
-    <string name="tutText1">Circle Player is a music app that plays music. But what does that mean?
+    <string name="tutTextOne">Circle Player is a music app that plays music. But what does that mean?
                             We\'re glad you asked! Have you ever used Spotify? Now imagine if
                             4 college students were tasked with making Spotify, but only one of them had Android experience.
-                            That's how Circle Player was born!</string>
-    <string name="tuttext2">To get started, hit the "Select Songs" button and select some audio files from your device.
+                            That\'s how Circle Player was born!</string>
+    <string name="tuttextTwo">To get started, hit the Select Songs button and select some audio files from your device.
                             Currently, Circle Player supports MP3, OGG, M4A, and WAV files. Once your songs are added, congrats!
-                            You've made what's commonly referred to as a "Playlist".</string>
-    <string name="tutText3">To edit a song\'s properties, select the song by long tapping (holding your finger down on it).
+                            You\'ve made what\'s commonly referred to as a Playlist.</string>
+    <string name="tutTextThree">To edit a song\'s properties, select the song by long tapping (holding your finger down on it).
                             A window will open up that will allow you to edit the song or delete it. Magic! The songs are stored
                             in a circular doubly linked list and the list is traversed, modified, and has items removed as you
                             manipulate your playlist. Please consider leaving us 3 stars for only being a minor inconvenience!</string>

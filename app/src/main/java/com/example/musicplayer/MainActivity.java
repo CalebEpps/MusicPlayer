@@ -1,8 +1,8 @@
 package com.example.musicplayer;
 
 import static android.content.ContentValues.TAG;
-
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
@@ -14,7 +14,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -32,7 +31,6 @@ import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -58,7 +56,6 @@ import abhishekti7.unicorn.filepicker.utils.Constants;
         void openSongEditor - method that initializes and displays the song popup to the user.
         void repopulateCDLL - General purpose method that clears and re initializes the circular doubly linked list if needed.
         void updateCurrentSong - Traverses the current circular doubly linked list in order to find the next song needed if one is deleted.
-
  */
 
 
@@ -155,11 +152,7 @@ public class MainActivity extends AppCompatActivity {
     Runnable preventionRunnable = new Runnable() {
         @Override
         public void run() {
-            if(tooSoonToSearch) {
-                tooSoonToSearch = false;
-            } else {
-                tooSoonToSearch = true;
-            }
+            tooSoonToSearch = !tooSoonToSearch;
             // Infinite Recursive Call
             handler.postDelayed(preventionRunnable, 500);
         }
@@ -175,7 +168,6 @@ public class MainActivity extends AppCompatActivity {
             handler.postDelayed(seekBarRunnable, 1000);
         }
     };
-
 
 
 // This string is important for setting up our title to display.
@@ -197,6 +189,10 @@ public class MainActivity extends AppCompatActivity {
     ArrayAdapter<String> artistAdapter;
     ArrayList<String> artistOptions;
 
+    boolean firstLaunch = true;
+    View openTutorial;
+    Button closeTutBtn;
+
 
 
     // onCreate Method for doing... Everything? The on create method
@@ -208,15 +204,21 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
-
-
-        // TODO: Save Variable to determine if user saw tutorial
-
-
-        // inflateEdit and editSongView are used to create our edit song popup
-        // This is used later when the user long presses a song title.
+        // inflateEdit is used to grab the instances of our popup windows.
         inflateEdit = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
+
+        // These lines will fetch our saved information so we can check if the user has launched the app before.
+        Context context = this;
+        SharedPreferences sharedPreferences = getSharedPreferences("firstLaunch", MODE_PRIVATE);
+        firstLaunch = sharedPreferences.getBoolean("firstLaunch", true);
+
+        // This will launch the tutorial page if the user is a new user.
+        if(firstLaunch) {
+            Intent intent = new Intent(this, TutorialActivity.class);
+            this.startActivity(intent);
+        }
+
+        // This is used later when the user long presses a song title.
         editsongView = inflateEdit.inflate(R.layout.edit_popup, null);
         songArr = parser.getEntries();
         // We initialize these classwide variables in the onCreate method because
@@ -226,6 +228,7 @@ public class MainActivity extends AppCompatActivity {
         // to the playlist which makes the adapters nonnull.
         genreSpinner = editsongView.findViewById(R.id.genreSpinner);
         artistSpinner = editsongView.findViewById(R.id.artistSpinner);
+
         if(songArr != null) {
             genreOptions = parser.search(true, "genre");
             genreAdapter = new ArrayAdapter<>(this,R.layout.support_simple_spinner_dropdown_item,genreOptions);
@@ -236,6 +239,7 @@ public class MainActivity extends AppCompatActivity {
             artistAdapter = new ArrayAdapter<>(this,R.layout.support_simple_spinner_dropdown_item, artistOptions);
             artistSpinner.setAdapter(artistAdapter);
         }
+
 
 
 
@@ -872,6 +876,20 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
+    public void openTutorial() {
+        // Get the parameters so we can set the size of our popup window.
+        int width = LinearLayout.LayoutParams.WRAP_CONTENT;
+        int height = LinearLayout.LayoutParams.WRAP_CONTENT;
+        // Create a final version of our popup window.
+        final PopupWindow editSongPopup = new PopupWindow(editsongView, width, height, true);
+        // This makes the background opaque.
+        editSongPopup.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        // Open the popup
+        editSongPopup.showAtLocation(editsongView, Gravity.CENTER,0,0);
+    }
+
+
     // Song Editor Popup method. Used on song item long click.
     public void openSongEditor(Song song) {
         // Get the parameters so we can set the size of our popup window.
@@ -1069,6 +1087,17 @@ public class MainActivity extends AppCompatActivity {
             currentSong = currentSong.next;
         }
         songTitle.setText(currentSong.song.getTitle());
+    }
+
+    protected void onPause() {
+        super.onPause();
+
+        SharedPreferences sharedPreferences = getSharedPreferences("firstLaunch", MODE_PRIVATE);
+        SharedPreferences.Editor editPreferences = sharedPreferences.edit();
+        if(firstLaunch = true) {
+            editPreferences.putBoolean("firstLaunch", false);
+            editPreferences.apply();
+        }
     }
 }
 

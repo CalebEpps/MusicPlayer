@@ -90,9 +90,6 @@ public class SplashScreen extends AppCompatActivity {
             }
         });
 
-
-
-
         handler = new Handler();
 // This code tells our program to delay the animation starting for a few seconds.
         handler.postDelayed(new Runnable() {

@@ -21,11 +21,13 @@
         <entry key="..\:/Users/caleb/AndroidStudioProjects/MusicPlayer/app/src/main/res/mipmap-anydpi-v26/app_icon.xml" value="0.2765625" />
         <entry key="..\:/Users/caleb/AndroidStudioProjects/MusicPlayer/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.159375" />
         <entry key="..\:/Users/caleb/StudioProjects/MusicPlayer/app/src/main/res/drawable/border_for_songs.xml" value="0.2171875" />
-        <entry key="..\:/Users/caleb/StudioProjects/MusicPlayer/app/src/main/res/layout/activity_main.xml" value="0.1" />
+        <entry key="..\:/Users/caleb/StudioProjects/MusicPlayer/app/src/main/res/layout/activity_main.xml" value="0.264" />
         <entry key="..\:/Users/caleb/StudioProjects/MusicPlayer/app/src/main/res/layout/activity_secret_splash_screen.xml" value="0.24864130434782608" />
+        <entry key="..\:/Users/caleb/StudioProjects/MusicPlayer/app/src/main/res/layout/activity_tutorial.xml" value="0.264" />
         <entry key="..\:/Users/caleb/StudioProjects/MusicPlayer/app/src/main/res/layout/activity_view_song_acitivty.xml" value="0.1578125" />
         <entry key="..\:/Users/caleb/StudioProjects/MusicPlayer/app/src/main/res/layout/edit_popup.xml" value="0.30294906166219837" />
         <entry key="..\:/Users/caleb/StudioProjects/MusicPlayer/app/src/main/res/layout/song_item.xml" value="0.1" />
+        <entry key="..\:/Users/caleb/StudioProjects/MusicPlayer/app/src/main/res/layout/tutorial_popup.xml" value="0.1" />
       </map>
     </option>
   </component>
