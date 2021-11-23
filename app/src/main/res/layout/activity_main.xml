@@ -35,10 +35,10 @@
 
         <TextView
             android:id="@+id/songTime"
-            android:fontFamily="@font/gilroy_heavy"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:fontFamily="@font/gilroy_heavy"
             android:foregroundGravity="center"
             android:gravity="center"
             android:text="@string/version" />
@@ -58,21 +58,76 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:textColor="#00F405"
             android:fontFamily="@font/gilroy_heavy"
             android:text="@string/select_file_button"
+            android:textColor="#00F405"
             android:textSize="15sp" />
     </LinearLayout>
+
+    <ImageView
+        android:id="@+id/rotatingAds"
+        android:layout_width="411dp"
+        android:layout_height="116dp"
+        android:scaleType="centerInside"
+        android:scaleX="1"
+        android:scaleY="1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:srcCompat="@drawable/ad_one" />
+
+    <LinearLayout
+        android:id="@+id/linearLayout2"
+        android:layout_width="412dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:scrollbars="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/seekBar"
+        app:layout_constraintVertical_bias="0.0">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/songList"
+            android:layout_width="match_parent"
+            android:layout_height="279dp"
+            android:scrollbars="vertical"
+            tools:ignore="NotSibling">
+
+        </androidx.recyclerview.widget.RecyclerView>
+
+    </LinearLayout>
+
+    <SeekBar
+        android:id="@+id/seekBar"
+        android:layout_width="411dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:progressBackgroundTint="@color/white"
+        android:progressTint="@color/spotifyGreen"
+        android:thumbTint="@color/spotifyGreen"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/timeInfo" />
 
     <LinearLayout
         android:id="@+id/btnAndSearchBar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
+        android:layout_marginTop="18dp"
         android:orientation="vertical"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/timeInfo">
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout2">
+
+        <SearchView
+            android:id="@+id/searchSongs"
+            android:layout_width="414dp"
+            android:layout_height="75sp"
+            android:searchIcon="@drawable/unicorn_ic_search" />
 
         <LinearLayout
             android:id="@+id/btnLayout"
@@ -137,71 +192,6 @@
                 tools:ignore="SpeakableTextPresentCheck" />
         </LinearLayout>
 
-        <SearchView
-            android:id="@+id/searchSongs"
-            android:layout_width="414dp"
-            android:layout_height="75sp"
-            android:searchIcon="@drawable/unicorn_ic_search" />
-
     </LinearLayout>
-
-    <ImageView
-        android:id="@+id/rotatingAds"
-        android:layout_width="411dp"
-        android:layout_height="116dp"
-        android:scaleType="centerInside"
-        android:scaleX="1"
-        android:scaleY="1"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:srcCompat="@drawable/ad_one" />
-
-    <LinearLayout
-        android:id="@+id/linearLayout2"
-        android:layout_width="412dp"
-        android:layout_height="348dp"
-        android:orientation="vertical"
-        android:scrollbars="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnAndSearchBar">
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/songList"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scrollbars="vertical"
-            tools:ignore="NotSibling">
-
-        </androidx.recyclerview.widget.RecyclerView>
-    </LinearLayout>
-
-    <SeekBar
-        android:id="@+id/seekBar"
-        android:layout_width="411dp"
-        android:layout_height="wrap_content"
-        android:progressTint="@color/spotifyGreen"
-        android:progressBackgroundTint="@color/white"
-        android:thumbTint="@color/spotifyGreen"
-        app:layout_constraintBottom_toTopOf="@+id/timeInfo"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/rotatingAds" />
-
-    <TextView
-        android:id="@+id/versionNum"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/version"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:fontFamily="@font/gilroy_heavy"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout2"
-        app:layout_constraintVertical_bias="1.0" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
