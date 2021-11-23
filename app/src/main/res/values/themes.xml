@@ -4,6 +4,8 @@
         <!-- Primary brand color. -->
 
         <item name="android:textColor">#00F405</item>
+        <item name="android:editTextColor">@color/spotifyGreen</item>
+        <item name="android:textColorHint">@color/spotifyGreen</item>
         <item name="android:windowBackground">@color/black</item>
         <!-- Secondary brand color. -->
         <item name="colorSecondary">@color/teal_200</item>

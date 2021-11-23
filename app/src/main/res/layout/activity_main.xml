@@ -140,7 +140,8 @@
         <SearchView
             android:id="@+id/searchSongs"
             android:layout_width="414dp"
-            android:layout_height="75sp" />
+            android:layout_height="75sp"
+            android:searchIcon="@drawable/unicorn_ic_search" />
 
     </LinearLayout>
 

@@ -38,7 +38,7 @@ class FormulaDivide {
         }
         // This is a fancy way of sorting an arraylist
         Collections.sort(toReturn);
-        // SOOOOOO We gotta make sure we only have 30 second intervals in our list.
+        // SOOOOOO We gotta make sure we only have "howToDivide" second intervals in our list.
         // This code does it. :D
         for(int i = 0; i < toReturn.size() - 1; i++) {
             if(Math.abs(toReturn.get(i+1)- toReturn.get(i)) < howToDivide) {
