@@ -1,5 +1,5 @@
 <resources>
-    <string name="main_name">Circle Player</string>
+    <string name="main_name">What Goes Around Comes Around</string>
     <string name="second_main_name">Where Every Song is a Circle</string>
     <string name="select_file_button">Select Songs</string>
     <string name="version">Version: 2.0.1</string>
@@ -21,9 +21,9 @@
                             Currently, Circle Player supports MP3, OGG, M4A, and WAV files. Once your songs are added, congrats!
                             You\'ve made what\'s commonly referred to as a Playlist.</string>
     <string name="tutTextThree">To edit a song\'s properties, select the song by long tapping (holding your finger down on it).
-                            A window will open up that will allow you to edit the song or delete it. Magic! The songs are stored
-                            in a circular doubly linked list and the list is traversed, modified, and has items removed as you
-                            manipulate your playlist. Please consider leaving us 3 stars for only being a minor inconvenience!</string>
+                            A window will open up that will allow you to edit the song or delete it. Magic! If
+                            Ensure that you have given the app full storage permissions (especially on Android Q+).
+                            Please consider leaving us 3 stars for only being a minor inconvenience!</string>
     <string name="closeTut">Click here to close me!</string>
 
 </resources>

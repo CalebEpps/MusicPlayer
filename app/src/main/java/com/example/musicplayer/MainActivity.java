@@ -241,9 +241,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
-
-
-
         // We initialize our recycler view immediately
         recyclerView = findViewById(R.id.songList);
         // Next we initialize our adapter. See the Song Adapter
