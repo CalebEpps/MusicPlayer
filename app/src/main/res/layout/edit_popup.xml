@@ -25,13 +25,6 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/editTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/editSongTitle" />
-
             <EditText
                 android:id="@+id/editTitleBox"
                 android:layout_width="wrap_content"
@@ -47,13 +40,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/editArtist"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/editSongArtist" />
 
             <EditText
                 android:id="@+id/editArtistBox"
@@ -99,13 +85,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/editGenre"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/editSongGenre" />
 
             <EditText
                 android:id="@+id/editGenreBox"
