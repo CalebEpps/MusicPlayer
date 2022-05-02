@@ -4,3 +4,4 @@
 - Banner Ads Implement CDLL to act as a carousel
 - Songs play on repeat due to playlist using the CDLL Data Structure
 - Persistent Song saving / searching via JSON.
+- ABSOLUTE Spaghetti code - First time writing Android Studio Code
